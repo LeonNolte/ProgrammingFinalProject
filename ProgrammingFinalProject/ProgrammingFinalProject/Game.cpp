@@ -14,7 +14,7 @@
 /// </summary>
 
 Game::Game() :
-	m_window{ sf::VideoMode{ 1200U, 800U, 32U }, "Kobold Mayhem" },
+	m_window{ sf::VideoMode{ WINDOW_WIDTH, WINDOW_HEIGHT, 32U }, "Kobold Mayhem" },
 	m_exitGame{false} //when true game will exit
 {
 	setupFontAndText(); // load font 
@@ -89,6 +89,22 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
+	if (sf::Keyboard::W == t_event.key.code)
+	{
+		movePlayer(Direction::Up);
+	}
+	if (sf::Keyboard::A == t_event.key.code)
+	{
+		movePlayer(Direction::Left);
+	}
+	if (sf::Keyboard::S == t_event.key.code)
+	{
+		movePlayer(Direction::Down);
+	}
+	if (sf::Keyboard::D == t_event.key.code)
+	{
+		movePlayer(Direction::Right);
+	}
 }
 
 /// <summary>
@@ -146,4 +162,63 @@ void Game::setupSprite()
 void Game::setupObjects()
 {
 	m_player.setPosition(100.0f, 100.0f);
+}
+
+/// <summary>
+/// moves player in certain direction
+/// </summary>
+/// <param name="t_direction"> direction of movement</param>
+void Game::movePlayer(Direction t_direction)
+{
+	sf::Vector2f newPosition = m_player.getPosition();
+
+	switch (t_direction)
+	{
+	case Direction::Up:
+		moveUp(newPosition, m_player.getSprite(), m_player.getSpeed());
+		m_player.newTextureRect(sf::IntRect(32, 0, 32, 32));
+		break;
+	case Direction::Down:
+		moveDown(newPosition, m_player.getSprite(), m_player.getSpeed());
+		m_player.newTextureRect(sf::IntRect(0, 0, 32, 32));
+		break;
+	case Direction::Left:
+		newPosition.x -= m_player.getSpeed();
+		break;
+	case Direction::Right:
+		newPosition.x += m_player.getSpeed();
+		break;
+	}
+
+	m_player.setPosition(newPosition);
+
+}
+
+/// <summary>
+/// moves game object up
+/// </summary>
+/// <param name="t_position"> position of object </param>
+/// <param name="t_sprite"> object sprite </param>
+void Game::moveUp(sf::Vector2f &t_position, sf::Sprite &t_sprite, float t_speed)
+{
+	sf::Vector2f newPosition = t_position;
+
+	if (t_position.y > 0.0f)
+	{
+		newPosition.y -= t_speed;
+		t_sprite.setPosition(newPosition);
+		t_position = newPosition;
+	}
+}
+
+void Game::moveDown(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed)
+{
+	sf::Vector2f newPosition = t_position;
+
+	if (t_position.y < WINDOW_HEIGHT - FIGURE_SIZE)
+	{
+		newPosition.y += t_speed;
+		t_sprite.setPosition(newPosition);
+		t_position = newPosition;
+	}
 }

@@ -19,6 +19,13 @@ Player::Player()
 	m_playerSprite.setTexture(m_playerTexture);
 	m_playerSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
 	m_playerSprite.setScale(4.0f, 4.0f);
+
+	m_speed = 5.0f;
+}
+
+sf::Vector2f Player::getPosition()
+{
+	return m_playerLocation;
 }
 
 /// <summary>
@@ -49,4 +56,18 @@ void Player::setPosition(sf::Vector2f t_position)
 sf::Sprite Player::getSprite()
 {
 	return m_playerSprite;
+}
+
+/// <summary>
+/// sets new texture rectangle
+/// </summary>
+/// <param name="t_textureRect"> new texturebrectangle </param>
+void Player::newTextureRect(sf::IntRect t_textureRect)
+{
+	m_playerSprite.setTextureRect(t_textureRect);
+}
+
+float Player::getSpeed()
+{
+	return m_speed;
 }

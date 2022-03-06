@@ -15,6 +15,10 @@
 #include <SFML/Graphics.hpp>
 #include "Player.h"
 
+const unsigned int WINDOW_WIDTH = 1200;
+const unsigned int WINDOW_HEIGHT = 800;
+const unsigned int FIGURE_SIZE = 32 * 4;
+
 class Game
 {
 public:
@@ -35,6 +39,11 @@ private:
 	void setupFontAndText();
 	void setupSprite();
 	void setupObjects();
+	void movePlayer(Direction t_direction);
+	void moveUp(sf::Vector2f &t_position, sf::Sprite &t_sprite, float t_speed);
+	void moveDown(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed);
+	void moveLeft(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed);
+	void moveRight(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed);
 
 	sf::RenderWindow m_window; // main SFML window
 	sf::Font m_ArialBlackfont; // font used by message
@@ -43,7 +52,7 @@ private:
 	sf::Sprite m_backgroundSprite; // sprite used for background
 	bool m_exitGame; // control exiting game
 
-	Player m_player;
+	Player m_player; // player object
 
 };
 

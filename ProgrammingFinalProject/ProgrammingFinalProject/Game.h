@@ -14,10 +14,12 @@
 
 #include <SFML/Graphics.hpp>
 #include "Player.h"
+#include "Stabber.h"
 
-const unsigned int WINDOW_WIDTH = 1200;
-const unsigned int WINDOW_HEIGHT = 800;
-const unsigned int FIGURE_SIZE = 32 * 4;
+const unsigned int WINDOW_WIDTH = 1200; // window width
+const unsigned int WINDOW_HEIGHT = 800; // window height
+const unsigned int FIGURE_SIZE = 32 * 4; // size of characters
+const unsigned short NUMBER_STABBERS = 6;
 
 class Game
 {
@@ -40,10 +42,10 @@ private:
 	void setupSprite();
 	void setupObjects();
 	void movePlayer(Direction t_direction);
-	void moveUp(sf::Vector2f &t_position, sf::Sprite &t_sprite, float t_speed);
-	void moveDown(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed);
-	void moveLeft(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed);
-	void moveRight(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed);
+	void moveUp(sf::Vector2f &t_position, float t_speed);
+	void moveDown(sf::Vector2f& t_position, float t_speed);
+	void moveLeft(sf::Vector2f& t_position, float t_speed);
+	void moveRight(sf::Vector2f& t_position, float t_speed);
 
 	sf::RenderWindow m_window; // main SFML window
 	sf::Font m_ArialBlackfont; // font used by message
@@ -53,6 +55,7 @@ private:
 	bool m_exitGame; // control exiting game
 
 	Player m_player; // player object
+	Stabber m_stabberKobold[NUMBER_STABBERS];
 
 };
 

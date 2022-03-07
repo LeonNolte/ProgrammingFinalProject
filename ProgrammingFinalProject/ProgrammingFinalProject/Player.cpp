@@ -1,5 +1,9 @@
-// Leon Nolte
-// C00263935
+/// <summary>
+/// Leon Nolte
+/// C00263935
+/// ------------------------------------------------------
+/// Player class: can move across the screen and shoot arrows 
+/// </summary>
 
 #include "Player.h"
 

@@ -19,7 +19,7 @@ Game::Game() :
 {
 	setupFontAndText(); // load font 
 	setupSprite(); // load texture
-
+	setupObjects();
 }
 
 /// <summary>
@@ -89,19 +89,19 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
-	if (sf::Keyboard::W == t_event.key.code)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
 		movePlayer(Direction::Up);
 	}
-	if (sf::Keyboard::A == t_event.key.code)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		movePlayer(Direction::Left);
 	}
-	if (sf::Keyboard::S == t_event.key.code)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
 		movePlayer(Direction::Down);
 	}
-	if (sf::Keyboard::D == t_event.key.code)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		movePlayer(Direction::Right);
 	}
@@ -126,6 +126,10 @@ void Game::render()
 {
 	m_window.clear(sf::Color::White);
 	m_window.draw(m_player.getSprite());
+	for (int index = 0; index < NUMBER_STABBERS; index++)
+	{
+		m_window.draw(m_stabberKobold[index].getSprite());
+	}
 	m_window.display();
 	
 }
@@ -161,64 +165,106 @@ void Game::setupSprite()
 /// </summary>
 void Game::setupObjects()
 {
+	sf::Vector2f stabberSpawn{ 20.0f, 20.0f };
+
 	m_player.setPosition(100.0f, 100.0f);
+	
+	for (short index = 0; index < NUMBER_STABBERS; index++)
+	{
+		m_stabberKobold[index].setPosition(stabberSpawn);
+		stabberSpawn.y += 50.0f;
+	}
 }
 
 /// <summary>
 /// moves player in certain direction
+/// diagonal movement is possible
 /// </summary>
-/// <param name="t_direction"> direction of movement</param>
+/// <param name="t_direction"> direction of movement </param>
 void Game::movePlayer(Direction t_direction)
 {
 	sf::Vector2f newPosition = m_player.getPosition();
-
+	
 	switch (t_direction)
 	{
 	case Direction::Up:
-		moveUp(newPosition, m_player.getSprite(), m_player.getSpeed());
+		moveUp(newPosition, m_player.getSpeed());
 		m_player.newTextureRect(sf::IntRect(32, 0, 32, 32));
 		break;
 	case Direction::Down:
-		moveDown(newPosition, m_player.getSprite(), m_player.getSpeed());
+		moveDown(newPosition, m_player.getSpeed());
 		m_player.newTextureRect(sf::IntRect(0, 0, 32, 32));
 		break;
 	case Direction::Left:
-		newPosition.x -= m_player.getSpeed();
+		moveLeft(newPosition, m_player.getSpeed());
+		m_player.newTextureRect(sf::IntRect(64, 0, 32, 32));
 		break;
 	case Direction::Right:
-		newPosition.x += m_player.getSpeed();
+		moveRight(newPosition, m_player.getSpeed());
+		m_player.newTextureRect(sf::IntRect(96, 0, 32, 32));
 		break;
 	}
-
+	
 	m_player.setPosition(newPosition);
 
 }
 
 /// <summary>
-/// moves game object up
+/// moves game object position vector towards the top of the screen
+/// checks boundaries
+/// (does not involve change to sprite)
 /// </summary>
 /// <param name="t_position"> position of object </param>
-/// <param name="t_sprite"> object sprite </param>
-void Game::moveUp(sf::Vector2f &t_position, sf::Sprite &t_sprite, float t_speed)
+/// <param name="t_speed"> speed parameter </param>
+void Game::moveUp(sf::Vector2f &t_position, float t_speed)
 {
-	sf::Vector2f newPosition = t_position;
-
 	if (t_position.y > 0.0f)
 	{
-		newPosition.y -= t_speed;
-		t_sprite.setPosition(newPosition);
-		t_position = newPosition;
+		t_position.y -= t_speed;
 	}
 }
 
-void Game::moveDown(sf::Vector2f& t_position, sf::Sprite& t_sprite, float t_speed)
+/// <summary>
+/// moves a game object position vector towards the bottom of the screen
+/// checks boundaries
+/// (does not involve change to sprite)
+/// </summary>
+/// <param name="t_position"> pointer to position vector </param>
+/// <param name="t_speed"> speed parameter </param>
+void Game::moveDown(sf::Vector2f& t_position, float t_speed)
 {
-	sf::Vector2f newPosition = t_position;
-
 	if (t_position.y < WINDOW_HEIGHT - FIGURE_SIZE)
 	{
-		newPosition.y += t_speed;
-		t_sprite.setPosition(newPosition);
-		t_position = newPosition;
+		t_position.y += t_speed;
+	}
+}
+
+/// <summary>
+/// moves a game object position vector towards the left side of the screen
+/// checks boundaries
+/// (does not involve change to sprite)
+/// </summary>
+/// <param name="t_position"> pointer to position vector </param>
+/// <param name="t_speed"> speed parameter </param>
+void Game::moveLeft(sf::Vector2f& t_position, float t_speed)
+{
+	if (t_position.x > 0.0f)
+	{
+		t_position.x -= t_speed;
+	}
+}
+
+/// <summary>
+/// moves a game object position vector towards the right side of the screen
+/// checks boundary
+/// (does not involve change to sprite)
+/// </summary>
+/// <param name="t_position"> pointer to position vector </param>
+/// <param name="t_speed"> speed parameter </param>
+void Game::moveRight(sf::Vector2f& t_position, float t_speed)
+{
+	if (t_position.x < WINDOW_WIDTH - FIGURE_SIZE)
+	{
+		t_position.x += t_speed;
 	}
 }

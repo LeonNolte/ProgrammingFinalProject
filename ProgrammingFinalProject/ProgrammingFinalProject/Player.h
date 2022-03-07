@@ -1,3 +1,10 @@
+/// <summary>
+/// Leon Nolte
+/// C00263935
+/// ------------------------------------------------------
+/// Player class: can move across the screen and shoot arrows 
+/// </summary>
+
 #pragma once
 
 #include <SFML/Graphics.hpp>

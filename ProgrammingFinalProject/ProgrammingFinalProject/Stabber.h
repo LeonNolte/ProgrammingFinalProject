@@ -17,11 +17,17 @@ public:
 
 	Stabber();
 	sf::Sprite getSprite();
-	void setPosition(sf::Vector2f t_position);
+	sf::Vector2f getPosition();
+	sf::Vector2f getVelocity();
+	void setPosition(sf::Vector2f t_newPosition);
+	void setVelocity(sf::Vector2f t_newVelocity);
+
+	const sf::Vector2f stabberStandardVelocity = { 2.0f, 0.0f };
 
 private:
 
 	sf::Vector2f m_stabberLocation;
+	sf::Vector2f m_stabberVelocity;
 	sf::Sprite m_stabberSprite;
 	sf::Texture m_stabberTexture;
 };

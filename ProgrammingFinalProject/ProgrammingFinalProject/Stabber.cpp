@@ -11,6 +11,7 @@
 Stabber::Stabber()
 {
 	m_stabberLocation = { 10.0f, 10.0f };
+	m_stabberVelocity = stabberStandardVelocity;
 	
 	if (!m_stabberTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet.png"))
 	{
@@ -23,16 +24,47 @@ Stabber::Stabber()
 	m_stabberSprite.setColor(sf::Color::Yellow);
 }
 
+/// <summary>
+/// gets sprite of stabber
+/// </summary>
+/// <returns> stabber sprite </returns>
 sf::Sprite Stabber::getSprite()
 {
 	return m_stabberSprite;
 }
 
 /// <summary>
+/// gets position of stabber
+/// </summary>
+/// <returns> position vector of stabber </returns>
+sf::Vector2f Stabber::getPosition()
+{
+	return m_stabberLocation;
+}
+
+/// <summary>
+/// gets velocity of Stabber Kobold
+/// </summary>
+/// <returns></returns>
+sf::Vector2f Stabber::getVelocity()
+{
+	return m_stabberVelocity;
+}
+
+/// <summary>
 /// sets position of Stabber Kobold
 /// </summary>
-void Stabber::setPosition(sf::Vector2f t_position)
+void Stabber::setPosition(sf::Vector2f t_newPosition)
 {
-	m_stabberLocation = t_position;
-	m_stabberSprite.setPosition(t_position);
+	m_stabberLocation = t_newPosition;
+	m_stabberSprite.setPosition(t_newPosition);
+}
+
+/// <summary>
+/// sets new velocity to stabber Kobold
+/// </summary>
+/// <param name="t_newVelocity"> new velocity for stabber </param>
+void Stabber::setVelocity(sf::Vector2f t_newVelocity)
+{
+	m_stabberVelocity = t_newVelocity;
 }

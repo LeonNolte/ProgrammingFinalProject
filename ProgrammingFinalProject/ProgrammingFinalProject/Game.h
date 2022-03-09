@@ -48,10 +48,10 @@ private:
 
 	// movement functions
 	void movePlayer(Direction t_direction);
-	void moveVertical(sf::Vector2f &t_position, sf::Vector2f t_velocity);
-	// void moveDown(sf::Vector2f& t_position, sf::Vector2f t_velocity);
-	void moveHorizontal(sf::Vector2f& t_position, sf::Vector2f t_velocity);
-	// void moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity);
+	void moveUp(sf::Vector2f &t_position, sf::Vector2f t_velocity);
+	void moveDown(sf::Vector2f& t_position, sf::Vector2f t_velocity);
+	void moveLeft(sf::Vector2f& t_position, sf::Vector2f t_velocity);
+	void moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity);
 	void stabberFollowPlayer();
 
 

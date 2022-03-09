@@ -10,6 +10,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <random>
+#include <time.h>
 
 class Stabber
 {
@@ -19,10 +21,13 @@ public:
 	sf::Sprite getSprite();
 	sf::Vector2f getPosition();
 	sf::Vector2f getVelocity();
+	float getSpeed();
+	int getZigZagCounter();
+	bool isCountingUp();
 	void setPosition(sf::Vector2f t_newPosition);
 	void setVelocity(sf::Vector2f t_newVelocity);
 
-	const sf::Vector2f stabberStandardVelocity = { 2.0f, 0.0f };
+	const float stabberStandardSpeed = 1.0f;
 
 private:
 
@@ -30,5 +35,9 @@ private:
 	sf::Vector2f m_stabberVelocity;
 	sf::Sprite m_stabberSprite;
 	sf::Texture m_stabberTexture;
+
+	int m_zigZagCounter = 0;
+	bool m_countingUp = true;
+
 };
 

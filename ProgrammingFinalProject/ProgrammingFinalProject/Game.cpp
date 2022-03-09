@@ -117,7 +117,7 @@ void Game::update(sf::Time t_deltaTime)
 		m_window.close();
 	}
 
-	// stabberFollowPlayer();
+	stabberFollowPlayer();
 }
 
 /// <summary>
@@ -190,23 +190,23 @@ void Game::movePlayer(Direction t_direction)
 	switch (t_direction)
 	{
 	case Direction::Up:
-		newVelocity.y = m_player.PLAYER_SPEED * -1.0f;
-		moveVertical(newPosition, newVelocity);
+		newVelocity.y = m_player.PLAYER_SPEED;
+		moveUp(newPosition, newVelocity);
 		m_player.newTextureRect(sf::IntRect(32, 0, 32, 32));
 		break;
 	case Direction::Down:
 		newVelocity.y = m_player.PLAYER_SPEED;
-		moveVertical(newPosition, newVelocity);
+		moveDown(newPosition, newVelocity);
 		m_player.newTextureRect(sf::IntRect(0, 0, 32, 32));
 		break;
 	case Direction::Left:
-		newVelocity.x = m_player.PLAYER_SPEED * -1.0f;
-		moveHorizontal(newPosition, newVelocity);
+		newVelocity.x = m_player.PLAYER_SPEED;
+		moveLeft(newPosition, newVelocity);
 		m_player.newTextureRect(sf::IntRect(64, 0, 32, 32));
 		break;
 	case Direction::Right:
 		newVelocity.x = m_player.PLAYER_SPEED;
-		moveHorizontal(newPosition, newVelocity);
+		moveRight(newPosition, newVelocity);
 		m_player.newTextureRect(sf::IntRect(96, 0, 32, 32));
 		break;
 	}
@@ -223,26 +223,22 @@ void Game::movePlayer(Direction t_direction)
 /// </summary>
 /// <param name="t_position"> position of object </param>
 /// <param name="t_speed"> speed parameter </param>
-void Game::moveVertical(sf::Vector2f &t_position, sf::Vector2f t_velocity)
+void Game::moveUp(sf::Vector2f &t_position, sf::Vector2f t_velocity)
 {
-	if (t_position.y >= 0.0f && t_position.y <= WINDOW_HEIGHT - FIGURE_SIZE)
+	if (t_position.y >= 0.0f)
 	{
-		t_position.y += t_velocity.y;
-	}
-	else
-	{
-		t_position.y -= t_velocity.y;
+		t_position.y -= t_velocity.y; // minus to move up
 	}
 }
 
-/*
+
 /// <summary>
 /// moves a game object position vector towards the bottom of the screen
 /// checks boundaries
 /// (does not involve change to sprite)
 /// </summary>
 /// <param name="t_position"> pointer to position vector </param>
-/// <param name="t_speed"> speed parameter </param>
+/// <param name="t_velocity"> speed parameter </param>
 void Game::moveDown(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 {
 	if (t_position.y < WINDOW_HEIGHT - FIGURE_SIZE)
@@ -250,7 +246,7 @@ void Game::moveDown(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 		t_position.y += t_velocity.y;
 	}
 }
-*/
+
 
 /// <summary>
 /// moves a game object position vector towards the left side of the screen
@@ -258,20 +254,16 @@ void Game::moveDown(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 /// (does not involve change to sprite)
 /// </summary>
 /// <param name="t_position"> pointer to position vector </param>
-/// <param name="t_speed"> speed parameter </param>
-void Game::moveHorizontal(sf::Vector2f& t_position, sf::Vector2f t_velocity)
+/// <param name="t_velocity"> speed parameter </param>
+void Game::moveLeft(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 {
-	if (t_position.x > 0.0f && t_position.x < WINDOW_WIDTH - FIGURE_SIZE)
-	{
-		t_position.x += t_velocity.x;
-	}
-	else
+	if (t_position.x > 0.0f)
 	{
 		t_position.x -= t_velocity.x;
 	}
 }
 
-/*
+
 /// <summary>
 /// moves a game object position vector towards the right side of the screen
 /// checks boundary
@@ -286,7 +278,7 @@ void Game::moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 		t_position.x += t_velocity.x;
 	}
 }
-*/
+
 
 /// <summary>
 /// function to make all stabbers follow the player
@@ -294,23 +286,66 @@ void Game::moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 void Game::stabberFollowPlayer()
 {
 	sf::Vector2f lineToPlayer; // line drawn from stabber to player
-	sf::Vector2f stepTowardsPlayer; // movement for next frame
+	sf::Vector2f zigZagStep; // movement for next frame
+	sf::Vector2f newVelocity; // new velocity of Kobold
 	sf::Vector2f newLocation; // sets new location of stabber
 
+	
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
 		newLocation = m_stabberKobold[index].getPosition();
-		lineToPlayer = (m_player.getPosition() - m_stabberKobold[index].getPosition()) * 100.0f; // draws line between stabber and player as vector
 
-		// projects standard velocity onto line to player
-		stepTowardsPlayer = vectorRejection(m_stabberKobold[index].stabberStandardVelocity, lineToPlayer);
+		
+		// for following
+		if (m_player.getPosition().x > m_stabberKobold[index].getPosition().x)
+		{
+			newVelocity.x = m_stabberKobold[index].getSpeed();
+			moveRight(newLocation, newVelocity);
+		}
+		if (m_player.getPosition().x < m_stabberKobold[index].getPosition().x)
+		{
+			newVelocity.x = m_stabberKobold[index].getSpeed();
+			moveLeft(newLocation, newVelocity);
+		}
 
-		m_stabberKobold[index].setVelocity(stepTowardsPlayer);
+		if (m_player.getPosition().y > m_stabberKobold[index].getPosition().y)
+		{
+			newVelocity.y = m_stabberKobold[index].getSpeed();
+			moveDown(newLocation, newVelocity);
+		}
+		if (m_player.getPosition().y < m_stabberKobold[index].getPosition().y)
+		{
+			newVelocity.y = m_stabberKobold[index].getSpeed();
+			moveUp(newLocation, newVelocity);
+		}
+		
+		
+		
+		// for zig zag
+		lineToPlayer = (m_player.getPosition() - m_stabberKobold[index].getPosition()); // draws line between stabber and player as vector
+		
+		if (m_stabberKobold[index].getZigZagCounter() < 0)
+		{
+			zigZagStep = { -2.0f, -2.0f };
+		}
+		else
+		{
+			zigZagStep = { 2.0f, 2.0f };
+		}
+		
 
-		moveHorizontal(newLocation, stepTowardsPlayer);
-		moveVertical(newLocation, stepTowardsPlayer);
+		newLocation += vectorRejection(zigZagStep, lineToPlayer); // rejects zig zag step from line to player
 
-		m_stabberKobold[index].setPosition(newLocation);
+
+		// sets velocity of Kobold to direction of player
+		m_stabberKobold[index].setVelocity(newVelocity);
+
+		if (newLocation.y >= 0.0f && newLocation.x >= 0.0f && newLocation.x <= WINDOW_WIDTH - FIGURE_SIZE && newLocation.y <= WINDOW_WIDTH - FIGURE_SIZE)
+		{
+			// sets position of Kobold to new location
+			m_stabberKobold[index].setPosition(newLocation);
+		}
+		
 	}
 }
 

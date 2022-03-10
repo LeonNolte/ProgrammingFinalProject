@@ -166,14 +166,24 @@ void Game::setupSprite()
 /// </summary>
 void Game::setupObjects()
 {
-	sf::Vector2f stabberSpawn{ 20.0f, 20.0f };
+	sf::Vector2f stabberSpawn1{ 20.0f, 20.0f };
+	sf::Vector2f stabberSpawn2{ 600.0f, 20.0f };
 
 	m_player.setPosition(100.0f, 100.0f);
 	
 	for (short index = 0; index < NUMBER_STABBERS; index++)
 	{
-		m_stabberKobold[index].setPosition(stabberSpawn);
-		stabberSpawn.y += 50.0f;
+		if (index % 2 == 0)
+		{
+			m_stabberKobold[index].setPosition(stabberSpawn1);
+			stabberSpawn1.y += 200.0f;
+		}
+		if (index % 2 == 1)
+		{
+			m_stabberKobold[index].setPosition(stabberSpawn2);
+			stabberSpawn2.y += 200.0f;
+		}
+		
 	}
 }
 
@@ -285,8 +295,6 @@ void Game::moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 /// </summary>
 void Game::stabberFollowPlayer()
 {
-	sf::Vector2f lineToPlayer; // line drawn from stabber to player
-	sf::Vector2f zigZagStep; // movement for next frame
 	sf::Vector2f newVelocity; // new velocity of Kobold
 	sf::Vector2f newLocation; // sets new location of stabber
 
@@ -318,24 +326,8 @@ void Game::stabberFollowPlayer()
 			newVelocity.y = m_stabberKobold[index].getSpeed();
 			moveUp(newLocation, newVelocity);
 		}
-		
-		
-		
-		// for zig zag
-		lineToPlayer = (m_player.getPosition() - m_stabberKobold[index].getPosition()); // draws line between stabber and player as vector
-		
-		if (m_stabberKobold[index].getZigZagCounter() < 0)
-		{
-			zigZagStep = { -2.0f, -2.0f };
-		}
-		else
-		{
-			zigZagStep = { 2.0f, 2.0f };
-		}
-		
 
-		newLocation += vectorRejection(zigZagStep, lineToPlayer); // rejects zig zag step from line to player
-
+		enemyZigZag(newLocation, index, EnemyType::stabber);
 
 		// sets velocity of Kobold to direction of player
 		m_stabberKobold[index].setVelocity(newVelocity);
@@ -347,6 +339,50 @@ void Game::stabberFollowPlayer()
 		}
 		
 	}
+}
+
+/// <summary>
+/// makes enemy walk in zig zag pattern
+/// </summary>
+/// <param name="t_arrayIndex"></param>
+/// <param name="t_enemy"></param>
+void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_enemy)
+{
+	sf::Vector2f lineToPlayer; // line drawn from stabber to player
+	sf::Vector2f zigZagStep; // zig zag movement for next frame
+
+	if (t_enemy == EnemyType::stabber)
+	{
+		// for zig zag
+		lineToPlayer = (m_player.getPosition() - m_stabberKobold[t_arrayIndex].getPosition()); // draws line between stabber and player as vector
+
+		if (m_stabberKobold[t_arrayIndex].getZigZagCounter() < 0)
+		{
+			zigZagStep = { -2.0f, -2.0f };
+		}
+		else
+		{
+			zigZagStep = { 2.0f, 2.0f };
+		}
+	}
+	
+	/* Needs to be made for throwers
+	else
+	{
+		// for zig zag
+		lineToPlayer = (m_player.getPosition() - m_stabberKobold[t_arrayIndex].getPosition()); // draws line between stabber and player as vector
+
+		if (m_stabberKobold[t_arrayIndex].getZigZagCounter() < 0)
+		{
+			zigZagStep = { -2.0f, -2.0f };
+		}
+		else
+		{
+			zigZagStep = { 2.0f, 2.0f };
+		}
+	}
+	*/
+	t_position += vectorRejection(zigZagStep, lineToPlayer); // rejects zig zag step from line to player
 }
 
 

@@ -36,7 +36,7 @@ private:
 	sf::Sprite m_stabberSprite;
 	sf::Texture m_stabberTexture;
 
-	int m_zigZagCounter = 0;
+	int m_zigZagCounter;
 	bool m_countingUp = true;
 
 };

@@ -18,6 +18,11 @@
 #include "MyVector2.h" // taken from Maths Lab Project "My Vector2f"
 #include <iostream>
 
+enum class EnemyType {
+	stabber,
+	thrower
+};
+
 const unsigned int WINDOW_WIDTH = 1200; // window width
 const unsigned int WINDOW_HEIGHT = 800; // window height
 const unsigned int FIGURE_SIZE = 32 * 4; // size of characters
@@ -53,6 +58,8 @@ private:
 	void moveLeft(sf::Vector2f& t_position, sf::Vector2f t_velocity);
 	void moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity);
 	void stabberFollowPlayer();
+	void enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_enemy);
+
 
 
 	// data members
@@ -62,6 +69,7 @@ private:
 	sf::Texture m_backgroundTexture; // texture used for sfml logo
 	sf::Sprite m_backgroundSprite; // sprite used for background
 	bool m_exitGame; // control exiting game
+	EnemyType enemy = EnemyType::stabber;
 
 	// objects
 	Player m_player; // Player object

@@ -12,7 +12,7 @@ Stabber::Stabber()
 {
 	std::srand(static_cast<unsigned>(time(nullptr)));
 
-	m_zigZagCounter = -59 +	std::rand() % 120;
+	m_zigZagCounter = -50 + rand() % 100;
 
 	m_stabberLocation = { 10.0f, 10.0f };
 	m_stabberVelocity = { 0.0f, 0.0f };
@@ -79,11 +79,11 @@ int Stabber::getZigZagCounter()
 		m_zigZagCounter--;
 	}
 
-	if (m_zigZagCounter > 60)
+	if (m_zigZagCounter > 50)
 	{
 		m_countingUp = !m_countingUp;
 	}
-	else if (m_zigZagCounter < -60)
+	else if (m_zigZagCounter < -50)
 	{
 		m_countingUp = !m_countingUp;
 	}

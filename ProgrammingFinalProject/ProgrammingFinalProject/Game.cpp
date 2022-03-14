@@ -18,7 +18,7 @@ Game::Game() :
 {
 	setupFontAndText(); // load font 
 	setupSprite(); // load texture
-	setupObjects();
+	setupObjects(); // construct game objects
 }
 
 /// <summary>
@@ -118,6 +118,7 @@ void Game::update(sf::Time t_deltaTime)
 	}
 
 	stabberFollowPlayer();
+	throwerFollowPlayer();
 }
 
 /// <summary>
@@ -130,6 +131,15 @@ void Game::render()
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
 		m_window.draw(m_stabberKobold[index].getSprite());
+
+		if (index > NUMBER_THROWERS - 1)
+		{
+			continue;
+		}
+		else
+		{
+			m_window.draw(m_throwerKobold[index].getSprite());
+		}
 	}
 	m_window.display();
 	
@@ -168,10 +178,11 @@ void Game::setupObjects()
 {
 	sf::Vector2f stabberSpawn1{ 20.0f, 20.0f };
 	sf::Vector2f stabberSpawn2{ 600.0f, 20.0f };
+	sf::Vector2f throwerSpawn{ 700.0f, 70.0f };
 
 	m_player.setPosition(100.0f, 100.0f);
 	
-	for (short index = 0; index < NUMBER_STABBERS; index++)
+	for (short index = 0; index < NUMBER_STABBERS; index++) // for now: one loop for throwers and stabbers
 	{
 		if (index % 2 == 0)
 		{
@@ -182,6 +193,15 @@ void Game::setupObjects()
 		{
 			m_stabberKobold[index].setPosition(stabberSpawn2);
 			stabberSpawn2.y += 200.0f;
+		}
+		if (index > NUMBER_THROWERS - 1)
+		{
+			continue;
+		}
+		else
+		{
+			m_throwerKobold[index].setPosition(throwerSpawn);
+			throwerSpawn.y += 150.0f;
 		}
 		
 	}
@@ -337,15 +357,88 @@ void Game::stabberFollowPlayer()
 			// sets position of Kobold to new location
 			m_stabberKobold[index].setPosition(newLocation);
 		}
-		
 	}
+}
+
+/// <summary>
+/// follow player function for thrower Kobolds
+/// Follow the player up until certain distance, then hover until throwing their spears
+/// </summary>
+void Game::throwerFollowPlayer()
+{
+	sf::Vector2f newVelocity; // new velocity of thrower Kobold
+	sf::Vector2f newLocation; // sets new location of thrower Kobold
+
+	for (int index = 0; index < NUMBER_THROWERS; index++)
+	{
+		newLocation = m_throwerKobold[index].getPosition();
+
+		// for following
+		if (m_player.getPosition().x > m_throwerKobold[index].getPosition().x)
+		{
+			newVelocity.x = m_throwerKobold[index].getSpeed();
+			moveRight(newLocation, newVelocity);
+		}
+		if (m_player.getPosition().x < m_throwerKobold[index].getPosition().x)
+		{
+			newVelocity.x = m_throwerKobold[index].getSpeed();
+			moveLeft(newLocation, newVelocity);
+		}
+
+		if (m_player.getPosition().y > m_throwerKobold[index].getPosition().y)
+		{
+			newVelocity.y = m_throwerKobold[index].getSpeed();
+			moveDown(newLocation, newVelocity);
+		}
+		if (m_player.getPosition().y < m_throwerKobold[index].getPosition().y)
+		{
+			newVelocity.y = m_throwerKobold[index].getSpeed();
+			moveUp(newLocation, newVelocity);
+		}
+
+		// sets velocity of Kobold to direction of player
+		m_throwerKobold[index].setVelocity(newVelocity);
+
+		
+		if (getDistanceToPlayer(newLocation, index, EnemyType::thrower) > 200.0f) // nested if to check for distance to player
+		{
+				// sets position of Kobold to new location
+				m_throwerKobold[index].setPosition(newLocation);
+		}
+	}
+}
+
+/// <summary>
+/// gets distance between Kobold and player
+/// </summary>
+/// <param name="t_position"> position of Kobold </param>
+/// <param name="t_arrayIndex"> array ID of Kobold </param>
+/// <param name="t_enemy"> type of Kobold </param>
+float Game::getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, EnemyType t_enemy)
+{
+	sf::Vector2f lineToPlayer; // line from Kobold to player
+	float distanceToPlayer = 0.0f; // distance to player sprite
+
+	if (t_enemy == EnemyType::thrower)
+	{
+		lineToPlayer = m_player.getPosition() - m_throwerKobold[t_arrayIndex].getPosition();
+	}
+	else
+	{
+		lineToPlayer = m_player.getPosition() - m_stabberKobold[t_arrayIndex].getPosition();
+	}
+
+	distanceToPlayer = vectorLength(lineToPlayer);
+
+	return distanceToPlayer;
 }
 
 /// <summary>
 /// makes enemy walk in zig zag pattern
 /// </summary>
-/// <param name="t_arrayIndex"></param>
-/// <param name="t_enemy"></param>
+/// <param name="t_position"> position of Kobold </param>
+/// <param name="t_arrayIndex"> array ID of Kobold </param>
+/// <param name="t_enemy"> type of Kobold </param>
 void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_enemy)
 {
 	sf::Vector2f lineToPlayer; // line drawn from stabber to player

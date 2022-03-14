@@ -15,6 +15,7 @@
 #include <SFML/Graphics.hpp>
 #include "Player.h"
 #include "Stabber.h"
+#include "Thrower.h"
 #include "MyVector2.h" // taken from Maths Lab Project "My Vector2f"
 #include <iostream>
 
@@ -27,6 +28,7 @@ const unsigned int WINDOW_WIDTH = 1200; // window width
 const unsigned int WINDOW_HEIGHT = 800; // window height
 const unsigned int FIGURE_SIZE = 32 * 4; // size of characters
 const unsigned short NUMBER_STABBERS = 6; // number of Stabber enemies
+const unsigned short NUMBER_THROWERS = 4; // number of throwers
 
 class Game
 {
@@ -58,22 +60,24 @@ private:
 	void moveLeft(sf::Vector2f& t_position, sf::Vector2f t_velocity);
 	void moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity);
 	void stabberFollowPlayer();
+	void throwerFollowPlayer();
+	float getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, EnemyType t_enemy);
 	void enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_enemy);
 
-
-
-	// data members
+	// non-character data members
 	sf::RenderWindow m_window; // main SFML window
 	sf::Font m_ArialBlackfont; // font used by message
 	sf::Text m_score; // text used for message on screen
 	sf::Texture m_backgroundTexture; // texture used for sfml logo
 	sf::Sprite m_backgroundSprite; // sprite used for background
 	bool m_exitGame; // control exiting game
-	EnemyType enemy = EnemyType::stabber;
+	EnemyType enemy = EnemyType::stabber; // basic enemy type enum
 
 	// objects
 	Player m_player; // Player object
 	Stabber m_stabberKobold[NUMBER_STABBERS]; // array of Stabber Kobolds
+	Thrower m_throwerKobold[NUMBER_THROWERS]; // array of thrower Kobolds
+	
 
 };
 

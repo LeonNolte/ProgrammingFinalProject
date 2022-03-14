@@ -24,12 +24,14 @@
     <ClCompile Include="MyVector2.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Stabber.cpp" />
+    <ClCompile Include="Thrower.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
     <ClInclude Include="MyVector2.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Stabber.h" />
+    <ClInclude Include="Thrower.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="ASSETS\IMAGES\SFML-LOGO.png">

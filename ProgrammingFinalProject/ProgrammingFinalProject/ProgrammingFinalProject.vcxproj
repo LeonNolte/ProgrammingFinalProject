@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyVector2.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="Thrower.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Arrow.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="MyVector2.h" />
     <ClInclude Include="Player.h" />

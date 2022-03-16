@@ -9,6 +9,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "Arrow.h"
 
 enum class Direction {
 	Up,
@@ -31,6 +32,9 @@ public:
 	sf::Sprite getSprite();
 	void newTextureRect(sf::IntRect t_textureRect);
 
+	void initializeArrows();
+	void shootArrow();
+
 	const float PLAYER_SPEED = 2.5f;
 	
 
@@ -40,4 +44,6 @@ private:
 	sf::Sprite m_playerSprite;
 	sf::Texture m_playerTexture;
 	sf::Vector2f m_playerVelocity;
+
+	Arrow m_arrows[10];
 };

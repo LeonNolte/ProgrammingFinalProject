@@ -22,7 +22,7 @@ Player::Player()
 
 	m_playerSprite.setTexture(m_playerTexture);
 	m_playerSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-	m_playerSprite.setScale(4.0f, 4.0f);
+	m_playerSprite.setScale(3.0f, 3.0f);
 
 	m_playerVelocity = { 0.0f, 0.0f };
 }

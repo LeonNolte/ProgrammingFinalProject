@@ -31,7 +31,7 @@ public:
 	sf::Sprite getSprite();
 	void newTextureRect(sf::IntRect t_textureRect);
 
-	const float PLAYER_SPEED = 5.0f;
+	const float PLAYER_SPEED = 2.5f;
 	
 
 

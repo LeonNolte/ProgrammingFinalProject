@@ -20,19 +20,16 @@ public:
 	Stabber();
 	sf::Sprite getSprite();
 	sf::Vector2f getPosition();
-	sf::Vector2f getVelocity();
 	float getSpeed();
 	int getZigZagCounter();
 	bool isCountingUp();
 	void setPosition(sf::Vector2f t_newPosition);
-	void setVelocity(sf::Vector2f t_newVelocity);
 
 	const float stabberStandardSpeed = 1.0f;
 
 private:
 
 	sf::Vector2f m_stabberLocation;
-	sf::Vector2f m_stabberVelocity;
 	sf::Sprite m_stabberSprite;
 	sf::Texture m_stabberTexture;
 

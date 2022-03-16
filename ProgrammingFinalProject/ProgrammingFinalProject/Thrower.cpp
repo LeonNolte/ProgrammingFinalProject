@@ -11,7 +11,6 @@
 Thrower::Thrower()
 {
 	m_throwerLocation = { 200.0f, 10.0f };
-	m_throwerVelocity = { 0.0f, 0.0f };
 
 	if (!m_throwerTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet.png"))
 	{
@@ -20,7 +19,7 @@ Thrower::Thrower()
 
 	m_throwerSprite.setTexture(m_throwerTexture);
 	m_throwerSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-	m_throwerSprite.setScale(4.0f, 4.0f);
+	m_throwerSprite.setScale(3.0f, 3.0f);
 	m_throwerSprite.setColor(sf::Color::Red);
 }
 
@@ -43,16 +42,7 @@ sf::Vector2f Thrower::getPosition()
 }
 
 /// <summary>
-/// gets stabber velocity
-/// </summary>
-/// <returns></returns>
-sf::Vector2f Thrower::getVelocity()
-{
-	return m_throwerVelocity;
-}
-
-/// <summary>
-/// gets velocity of Stabber Kobold
+/// gets speed of Stabber Kobold
 /// </summary>
 /// <returns> standard speed </returns>
 float Thrower::getSpeed()
@@ -67,13 +57,4 @@ void Thrower::setPosition(sf::Vector2f t_newPosition)
 {
 	m_throwerLocation = t_newPosition;
 	m_throwerSprite.setPosition(t_newPosition);
-}
-
-/// <summary>
-/// sets new velocity to stabber Kobold
-/// </summary>
-/// <param name="t_newVelocity"> new velocity for stabber </param>
-void Thrower::setVelocity(sf::Vector2f t_newVelocity)
-{
-	m_throwerVelocity = t_newVelocity;
 }

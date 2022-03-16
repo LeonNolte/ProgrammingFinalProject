@@ -88,6 +88,20 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
+}
+
+/// <summary>
+/// Update the game world
+/// </summary>
+/// <param name="t_deltaTime">time interval per frame</param>
+void Game::update(sf::Time t_deltaTime)
+{
+	if (m_exitGame)
+	{
+		m_window.close();
+	}
+
+	// key check in update for smoother controlls 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
 		movePlayer(Direction::Up);
@@ -103,18 +117,6 @@ void Game::processKeys(sf::Event t_event)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		movePlayer(Direction::Right);
-	}
-}
-
-/// <summary>
-/// Update the game world
-/// </summary>
-/// <param name="t_deltaTime">time interval per frame</param>
-void Game::update(sf::Time t_deltaTime)
-{
-	if (m_exitGame)
-	{
-		m_window.close();
 	}
 
 	stabberFollowPlayer();
@@ -349,9 +351,6 @@ void Game::stabberFollowPlayer()
 
 		enemyZigZag(newLocation, index, EnemyType::stabber);
 
-		// sets velocity of Kobold to direction of player
-		m_stabberKobold[index].setVelocity(newVelocity);
-
 		if (newLocation.y >= 0.0f && newLocation.x >= 0.0f && newLocation.x <= WINDOW_WIDTH - FIGURE_SIZE && newLocation.y <= WINDOW_WIDTH - FIGURE_SIZE)
 		{
 			// sets position of Kobold to new location
@@ -384,7 +383,6 @@ void Game::throwerFollowPlayer()
 			newVelocity.x = m_throwerKobold[index].getSpeed();
 			moveLeft(newLocation, newVelocity);
 		}
-
 		if (m_player.getPosition().y > m_throwerKobold[index].getPosition().y)
 		{
 			newVelocity.y = m_throwerKobold[index].getSpeed();
@@ -396,14 +394,43 @@ void Game::throwerFollowPlayer()
 			moveUp(newLocation, newVelocity);
 		}
 
-		// sets velocity of Kobold to direction of player
-		m_throwerKobold[index].setVelocity(newVelocity);
-
 		
-		if (getDistanceToPlayer(newLocation, index, EnemyType::thrower) > 200.0f) // nested if to check for distance to player
+		if (getDistanceToPlayer(newLocation, index, EnemyType::thrower) > 300.0f)
 		{
 				// sets position of Kobold to new location
 				m_throwerKobold[index].setPosition(newLocation);
+		}
+
+		
+		if (getDistanceToPlayer(newLocation, index, EnemyType::thrower) < 200.0f) // if player gets too close
+		{
+			newVelocity *= 2.0f; // to negate previous movement
+
+			// reverse movement to follow player
+			if (newLocation.x >= 0.0f && newLocation.x <= WINDOW_WIDTH - FIGURE_SIZE) // basic bound check
+			{
+				if (newLocation.x > m_player.getPosition().x)
+				{
+					newLocation.x += newVelocity.x;
+				}
+				else
+				{
+					newLocation.x -= newVelocity.x;
+				}
+			}
+			if (newLocation.y >= 0.0f && newLocation.y <= WINDOW_WIDTH - FIGURE_SIZE) // bound check y
+			{
+				if (newLocation.y > m_player.getPosition().y)
+				{
+					newLocation.y += newVelocity.y;
+				}
+				else
+				{
+					newLocation.y -= newVelocity.y;
+				}
+			}
+				
+			m_throwerKobold[index].setPosition(newLocation);
 		}
 	}
 }
@@ -459,22 +486,6 @@ void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_e
 		}
 	}
 	
-	/* Needs to be made for throwers
-	else
-	{
-		// for zig zag
-		lineToPlayer = (m_player.getPosition() - m_stabberKobold[t_arrayIndex].getPosition()); // draws line between stabber and player as vector
-
-		if (m_stabberKobold[t_arrayIndex].getZigZagCounter() < 0)
-		{
-			zigZagStep = { -2.0f, -2.0f };
-		}
-		else
-		{
-			zigZagStep = { 2.0f, 2.0f };
-		}
-	}
-	*/
 	t_position += vectorRejection(zigZagStep, lineToPlayer); // rejects zig zag step from line to player
 }
 

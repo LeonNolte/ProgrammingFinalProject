@@ -10,12 +10,9 @@
 
 Stabber::Stabber()
 {
-	std::srand(static_cast<unsigned>(time(nullptr)));
-
 	m_zigZagCounter = -50 + rand() % 100;
 
 	m_stabberLocation = { 10.0f, 10.0f };
-	m_stabberVelocity = { 0.0f, 0.0f };
 	
 	if (!m_stabberTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet.png"))
 	{
@@ -24,7 +21,7 @@ Stabber::Stabber()
 
 	m_stabberSprite.setTexture(m_stabberTexture);
 	m_stabberSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-	m_stabberSprite.setScale(4.0f, 4.0f);
+	m_stabberSprite.setScale(3.0f, 3.0f);
 	m_stabberSprite.setColor(sf::Color::Yellow);
 }
 
@@ -46,17 +43,9 @@ sf::Vector2f Stabber::getPosition()
 	return m_stabberLocation;
 }
 
-/// <summary>
-/// gets stabber velocity
-/// </summary>
-/// <returns></returns>
-sf::Vector2f Stabber::getVelocity()
-{
-	return m_stabberVelocity;
-}
 
 /// <summary>
-/// gets velocity of Stabber Kobold
+/// gets speed of Stabber Kobold
 /// </summary>
 /// <returns> standard speed </returns>
 float Stabber::getSpeed()
@@ -107,13 +96,4 @@ void Stabber::setPosition(sf::Vector2f t_newPosition)
 {
 	m_stabberLocation = t_newPosition;
 	m_stabberSprite.setPosition(t_newPosition);
-}
-
-/// <summary>
-/// sets new velocity to stabber Kobold
-/// </summary>
-/// <param name="t_newVelocity"> new velocity for stabber </param>
-void Stabber::setVelocity(sf::Vector2f t_newVelocity)
-{
-	m_stabberVelocity = t_newVelocity;
 }

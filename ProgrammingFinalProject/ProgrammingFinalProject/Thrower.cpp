@@ -12,15 +12,14 @@ Thrower::Thrower()
 {
 	m_throwerLocation = { 200.0f, 10.0f };
 
-	if (!m_throwerTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet.png"))
+	if (!m_throwerTexture.loadFromFile("ASSETS\\IMAGES\\Thrower.png"))
 	{
-		std::cout << "problem loading player texture" << std::endl;
+		std::cout << "problem loading thrower texture" << std::endl;
 	}
 
 	m_throwerSprite.setTexture(m_throwerTexture);
 	m_throwerSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
 	m_throwerSprite.setScale(3.0f, 3.0f);
-	m_throwerSprite.setColor(sf::Color::Red);
 }
 
 /// <summary>

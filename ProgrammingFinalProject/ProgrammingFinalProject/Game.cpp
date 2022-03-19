@@ -74,6 +74,10 @@ void Game::processEvents()
 		{
 			processKeys(newEvent);
 		}
+		if (sf::Event::MouseButtonReleased == newEvent.type) // user pressed mouse button
+		{
+			processMouseReleases(newEvent);
+		}
 	}
 }
 
@@ -87,6 +91,27 @@ void Game::processKeys(sf::Event t_event)
 	if (sf::Keyboard::Escape == t_event.key.code)
 	{
 		m_exitGame = true;
+	}
+}
+
+/// <summary>
+/// deals with mouse clicks from user
+/// </summary>
+/// <param name="t_event"> mouse click event </param>
+void Game::processMouseClikcs(sf::Event t_event)
+{
+	// curently empty, used for extra functionality arrow shot
+}
+
+/// <summary>
+/// deal with mouse releases from user
+/// </summary>
+/// <param name="t_event"> mouse release revent </param>
+void Game::processMouseReleases(sf::Event t_event)
+{
+	if (sf::Mouse::Left == t_event.key.code)
+	{
+		m_player.shootArrow(m_arrow, sf::Mouse::getPosition(m_window));
 	}
 }
 
@@ -121,6 +146,7 @@ void Game::update(sf::Time t_deltaTime)
 
 	stabberFollowPlayer();
 	throwerFollowPlayer();
+	moveArrow();
 }
 
 /// <summary>
@@ -129,6 +155,7 @@ void Game::update(sf::Time t_deltaTime)
 void Game::render()
 {
 	m_window.clear(sf::Color::White);
+	m_window.draw(m_backgroundSprite);
 	m_window.draw(m_player.getSprite());
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
@@ -143,6 +170,7 @@ void Game::render()
 			m_window.draw(m_throwerKobold[index].getSprite());
 		}
 	}
+	m_window.draw(m_arrow.getSprite());
 	m_window.display();
 	
 }
@@ -169,7 +197,13 @@ void Game::setupFontAndText()
 /// </summary>
 void Game::setupSprite()
 {
-	
+	if (!m_backgroundTexture.loadFromFile("ASSETS\\IMAGES\\Background_Day.png"))
+	{
+		std::cout << "problem loading background texture" << std::endl;
+	}
+	m_backgroundSprite.setTexture(m_backgroundTexture);
+	m_backgroundSprite.setScale(3.0f, 3.0f);
+	m_backgroundSprite.setPosition(0.0f, 0.0f);
 }
 
 /// <summary>
@@ -351,7 +385,7 @@ void Game::stabberFollowPlayer()
 
 		enemyZigZag(newLocation, index, EnemyType::stabber);
 
-		if (newLocation.y >= 0.0f && newLocation.x >= 0.0f && newLocation.x <= WINDOW_WIDTH - FIGURE_SIZE && newLocation.y <= WINDOW_WIDTH - FIGURE_SIZE)
+		if (newLocation.y >= 0.0f && newLocation.x >= 0.0f && newLocation.x <= WINDOW_WIDTH - FIGURE_SIZE && newLocation.y <= WINDOW_HEIGHT - FIGURE_SIZE)
 		{
 			// sets position of Kobold to new location
 			m_stabberKobold[index].setPosition(newLocation);
@@ -487,6 +521,16 @@ void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_e
 	}
 	
 	t_position += vectorRejection(zigZagStep, lineToPlayer); // rejects zig zag step from line to player
+}
+
+/// <summary>
+/// moves arrow
+/// </summary>
+void Game::moveArrow()
+{
+	sf::Vector2f newPosition = m_arrow.getPosition();
+	newPosition += m_arrow.getVelocity();
+	m_arrow.setPosition(newPosition);
 }
 
 

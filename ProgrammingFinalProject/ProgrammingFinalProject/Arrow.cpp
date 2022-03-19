@@ -13,7 +13,7 @@
 Arrow::Arrow()
 {
 	m_arrowHitBox.setFillColor(sf::Color::Blue);
-	m_arrowHitBox.setRadius(2.0f);
+	m_arrowHitBox.setRadius(5.0f);
 	m_arrowHitBox.setPosition(5.0f, 5.0f);
 }
 
@@ -24,6 +24,11 @@ Arrow::Arrow()
 void Arrow::setPosition(sf::Vector2f t_newPosition)
 {
 	m_arrowHitBox.setPosition(t_newPosition);
+}
+
+void Arrow::setPosition(float t_x, float t_y)
+{
+	m_arrowHitBox.setPosition(t_x, t_y);
 }
 
 /// <summary>
@@ -51,4 +56,22 @@ void Arrow::setVelocity(sf::Vector2f t_newVelocity)
 sf::Vector2f Arrow::getVelocity()
 {
 	return m_arrowVelocity;
+}
+
+/// <summary>
+/// sets new status of arrow
+/// </summary>
+/// <param name="t_travelStatus"> new travel status </param>
+void Arrow::setTraveling(bool t_travelStatus)
+{
+	m_traveling = t_travelStatus;
+}
+
+/// <summary>
+/// gets status of arrow
+/// </summary>
+/// <returns> true if traveling, false if not traveling</returns>
+bool Arrow::getTraveling()
+{
+	return m_traveling;
 }

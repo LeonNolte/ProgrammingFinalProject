@@ -25,7 +25,7 @@ enum class EnemyType {
 };
 
 const unsigned int WINDOW_WIDTH = 1200; // window width
-const unsigned int WINDOW_HEIGHT = 800; // window height
+const unsigned int WINDOW_HEIGHT = 900; // window height
 const unsigned int FIGURE_SIZE = 32 * 3; // size of characters
 const unsigned short NUMBER_STABBERS = 6; // number of Stabber enemies
 const unsigned short NUMBER_THROWERS = 4; // number of throwers
@@ -45,6 +45,8 @@ private:
 	// game loop functions
 	void processEvents();
 	void processKeys(sf::Event t_event);
+	void processMouseClikcs(sf::Event t_event);
+	void processMouseReleases(sf::Event t_event);
 	void update(sf::Time t_deltaTime);
 	void render();
 	
@@ -53,7 +55,7 @@ private:
 	void setupSprite();
 	void setupObjects();
 
-	// movement functions
+	// character movement functions
 	void movePlayer(Direction t_direction);
 	void moveUp(sf::Vector2f &t_position, sf::Vector2f t_velocity);
 	void moveDown(sf::Vector2f& t_position, sf::Vector2f t_velocity);
@@ -63,6 +65,9 @@ private:
 	void throwerFollowPlayer();
 	float getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, EnemyType t_enemy);
 	void enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_enemy);
+	
+	// projectile movement functions
+	void moveArrow();
 
 	// non-character data members
 	sf::RenderWindow m_window; // main SFML window
@@ -71,12 +76,17 @@ private:
 	sf::Texture m_backgroundTexture; // texture used for sfml logo
 	sf::Sprite m_backgroundSprite; // sprite used for background
 	bool m_exitGame; // control exiting game
+
+	// object related data members
 	EnemyType enemy = EnemyType::stabber; // basic enemy type enum
+	sf::Vector2f m_arrowVelocity;
 
 	// objects
 	Player m_player; // Player object
 	Stabber m_stabberKobold[NUMBER_STABBERS]; // array of Stabber Kobolds
 	Thrower m_throwerKobold[NUMBER_THROWERS]; // array of thrower Kobolds
+	Arrow m_arrow; // arrow object
+
 	
 
 };

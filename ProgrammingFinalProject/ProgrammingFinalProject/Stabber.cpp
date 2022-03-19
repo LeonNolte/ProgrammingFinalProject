@@ -14,15 +14,14 @@ Stabber::Stabber()
 
 	m_stabberLocation = { 10.0f, 10.0f };
 	
-	if (!m_stabberTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet.png"))
+	if (!m_stabberTexture.loadFromFile("ASSETS\\IMAGES\\Stabber.png"))
 	{
-		std::cout << "problem loading player texture" << std::endl;
+		std::cout << "problem loading stabber texture" << std::endl;
 	}
 
 	m_stabberSprite.setTexture(m_stabberTexture);
 	m_stabberSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
 	m_stabberSprite.setScale(3.0f, 3.0f);
-	m_stabberSprite.setColor(sf::Color::Yellow);
 }
 
 /// <summary>

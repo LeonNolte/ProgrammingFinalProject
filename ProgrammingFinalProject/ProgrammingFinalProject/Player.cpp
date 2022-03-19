@@ -6,6 +6,7 @@
 /// </summary>
 
 #include "Player.h"
+#include "MyVector2.h"
 
 /// <summary>
 /// constructor for player class
@@ -15,7 +16,7 @@ Player::Player()
 	m_playerLocation = { 100.0, 100.0 };
 	m_playerSprite.setPosition(m_playerLocation);
 
-	if (!m_playerTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet.png"))
+	if (!m_playerTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet_New.png"))
 	{
 		std::cout << "problem loading player texture" << std::endl;
 	}
@@ -90,6 +91,33 @@ void Player::newTextureRect(sf::IntRect t_textureRect)
 	m_playerSprite.setTextureRect(t_textureRect);
 }
 
+/// <summary>
+/// Creates array of arrows
+/// </summary>
+void Player::initializeArrows()
+{
+	// currently empty, will be used once arrow array is implemented
+}
+
+/// <summary>
+/// shoots arrow into direction of 
+/// </summary>
+void Player::shootArrow(Arrow& t_arrow, sf::Vector2i t_direction)
+{
+	sf::Vector2f playerCenter = { 48.0f, 48.0f }; // (sprite sheet resolution / 2) * figure scaling (3) --> (32px / 2) * 3 = 48
+	sf::Vector2f arrowVelocity;
+	arrowVelocity = static_cast<sf::Vector2f>(t_direction) - (m_playerLocation + playerCenter);
+	t_arrow.setPosition(m_playerLocation + playerCenter);
+
+	arrowVelocity = vectorUnitVector(arrowVelocity) * t_arrow.STANDARD_SPEED;
+
+	t_arrow.setVelocity(arrowVelocity);
+}
+
+/// <summary>
+/// gets velocity of player
+/// </summary>
+/// <returns> velocity vector </returns>
 sf::Vector2f Player::getVelocity()
 {
 	return m_playerVelocity;

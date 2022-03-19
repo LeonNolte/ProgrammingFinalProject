@@ -18,6 +18,8 @@ enum class Direction {
 	Right
 };
 
+const int NUMBER_ARROWS = 10;
+
 class Player
 {
 public:
@@ -33,9 +35,10 @@ public:
 	void newTextureRect(sf::IntRect t_textureRect);
 
 	void initializeArrows();
-	void shootArrow();
+	void shootArrow(Arrow& t_arrow, sf::Vector2i t_direction);
 
 	const float PLAYER_SPEED = 2.5f;
+
 	
 
 
@@ -44,6 +47,4 @@ private:
 	sf::Sprite m_playerSprite;
 	sf::Texture m_playerTexture;
 	sf::Vector2f m_playerVelocity;
-
-	Arrow m_arrows[10];
 };

@@ -12,6 +12,7 @@
 /// Session 7: 10:05 - 10:50 (14/03/22)
 /// Session 8: 9:30 - 10:55 (16/03/22)
 /// Session 9: 17:30 - 20:15 (19/03/22)
+/// Session 10: 13:15 - 16:15 (20/03/22)
 /// -----------------------------------------------------------------------------
 /// Simple game in which the player takes control over an archer, who is fending of waves of Kobolds.
 /// Move using WASD, soot by clicking the left mouse button.
@@ -20,7 +21,7 @@
 /// The player will receive a score based on how much health they have left, and how many Kobolds they killed.
 /// For more details, refer to the Game Design Document.
 /// -----------------------------------------------------------------------------
-/// Known bugs: delayed movement reaction upon pressing the movement keys (duo to windowns keyboard configuration)
+/// Known bugs: Kobolds can be knocked out of bound by player
 /// </summary>
 
 #ifdef _DEBUG 

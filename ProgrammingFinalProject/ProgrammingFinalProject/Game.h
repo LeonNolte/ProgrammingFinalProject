@@ -24,6 +24,15 @@ enum class EnemyType {
 	thrower
 };
 
+enum class BlockCheck {
+	unobstructed,
+	intersects,
+	unblockedUp,
+	unblockedRight,
+	unblockedDown,
+	unblockedLeft
+};
+
 const unsigned int WINDOW_WIDTH = 1200; // window width
 const unsigned int WINDOW_HEIGHT = 900; // window height
 const unsigned int FIGURE_SIZE = 32 * 3; // size of characters
@@ -68,6 +77,11 @@ private:
 	
 	// projectile movement functions
 	void moveArrow();
+
+	// bound-check functions
+	BlockCheck characterBoundCheck(sf::Sprite t_charSprite);
+	bool checkCollisionsVertical(sf::Sprite &t_charSprite);
+	bool checkCollisionsHorizontal(sf::Sprite &t_charSprite);
 
 	// non-character data members
 	sf::RenderWindow m_window; // main SFML window

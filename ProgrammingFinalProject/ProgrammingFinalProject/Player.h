@@ -44,7 +44,9 @@ public:
 
 private:
 	sf::Vector2f m_playerLocation;
+	sf::Vector2f m_playerCenterLocation; 
 	sf::Sprite m_playerSprite;
 	sf::Texture m_playerTexture;
 	sf::Vector2f m_playerVelocity;
+
 };

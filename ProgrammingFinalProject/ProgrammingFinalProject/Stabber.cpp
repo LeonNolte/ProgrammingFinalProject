@@ -89,10 +89,22 @@ bool Stabber::isCountingUp()
 }
 
 /// <summary>
-/// sets position of Stabber Kobold
+/// sets position of Stabber Kobold using vector
 /// </summary>
 void Stabber::setPosition(sf::Vector2f t_newPosition)
 {
 	m_stabberLocation = t_newPosition;
 	m_stabberSprite.setPosition(t_newPosition);
+}
+
+/// <summary>
+/// sets position of Stabber Kobold using floats
+/// </summary>
+/// <param name="t_x"> x parameter </param>
+/// <param name="t_y"> y parameter </param>
+void Stabber::setPosition(float t_x, float t_y)
+{
+	m_stabberLocation.x = t_x;
+	m_stabberLocation.x = t_x;
+	m_stabberSprite.setPosition(m_stabberLocation);
 }

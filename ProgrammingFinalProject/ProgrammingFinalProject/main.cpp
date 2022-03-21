@@ -13,13 +13,14 @@
 /// Session 8: 9:30 - 10:55 (16/03/22)
 /// Session 9: 17:30 - 20:15 (19/03/22)
 /// Session 10: 13:15 - 16:15 (20/03/22)
+/// Session 11: 9:30 - 10:45 (21/03/22)
 /// -----------------------------------------------------------------------------
 /// Simple game in which the player takes control over an archer, who is fending of waves of Kobolds.
-/// Move using WASD, soot by clicking the left mouse button.
+/// Move using WASD, shoot by clicking the left mouse button.
 /// There are two types of enemies: Kobold "stabbers" and Kobold "throwers." Stabbers approach the player in a zig-zag pattern and stab when close. 
 /// Throwers run towards the player a bit, throw their Javelins, and then leave the battlefield. The player must survive three waves to win the game.
 /// The player will receive a score based on how much health they have left, and how many Kobolds they killed.
-/// For more details, refer to the Game Design Document.
+/// For more details, see the Game Design Document.
 /// -----------------------------------------------------------------------------
 /// Known bugs: Kobolds can be knocked out of bound by player
 /// </summary>

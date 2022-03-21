@@ -146,7 +146,10 @@ void Game::update(sf::Time t_deltaTime)
 
 	stabberFollowPlayer();
 	throwerFollowPlayer();
-	moveArrow();
+	if (m_arrow.getTraveling() == true)
+	{
+		moveArrow();
+	}
 }
 
 /// <summary>
@@ -212,9 +215,9 @@ void Game::setupSprite()
 /// </summary>
 void Game::setupObjects()
 {
-	sf::Vector2f stabberSpawn1{ 20.0f, 20.0f };
-	sf::Vector2f stabberSpawn2{ 600.0f, 20.0f };
-	sf::Vector2f throwerSpawn{ 700.0f, 70.0f };
+	sf::Vector2f stabberSpawn1{ 100.0f, 20.0f };
+	sf::Vector2f stabberSpawn2{ WINDOW_WIDTH - 150.0f, 150.0f };
+	sf::Vector2f throwerSpawn{ WINDOW_WIDTH - 100.0f, 100.0f };
 
 	m_player.setPosition(100.0f, 100.0f);
 	
@@ -383,13 +386,14 @@ void Game::stabberFollowPlayer()
 {
 	sf::Vector2f newVelocity; // new velocity of Kobold
 	sf::Vector2f newLocation; // sets new location of stabber
+	sf::Vector2f oldLocation; // to reset location for bound check
 
 	
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
 		newLocation = m_stabberKobold[index].getPosition();
+		oldLocation = newLocation;
 
-		
 		// for following
 		if (m_player.getPosition().x > m_stabberKobold[index].getPosition().x)
 		{
@@ -401,7 +405,6 @@ void Game::stabberFollowPlayer()
 			newVelocity.x = m_stabberKobold[index].getSpeed();
 			moveLeft(newLocation, newVelocity);
 		}
-
 		if (m_player.getPosition().y > m_stabberKobold[index].getPosition().y)
 		{
 			newVelocity.y = m_stabberKobold[index].getSpeed();
@@ -413,13 +416,23 @@ void Game::stabberFollowPlayer()
 			moveUp(newLocation, newVelocity);
 		}
 
+		// call zig-zag function
 		enemyZigZag(newLocation, index, EnemyType::stabber);
 
-		if (newLocation.y >= 0.0f && newLocation.x >= 0.0f && newLocation.x <= WINDOW_WIDTH - FIGURE_SIZE && newLocation.y <= WINDOW_HEIGHT - FIGURE_SIZE)
+		// sets position of Kobold to new location
+		if (newLocation.x <= 0.0f || newLocation.x >= WINDOW_WIDTH - FIGURE_SIZE) // when out of bounds horizontally
 		{
-			// sets position of Kobold to new location
+			m_stabberKobold[index].setPosition(oldLocation.x, newLocation.y);
+		}
+		else if (newLocation.y <= 0.0f || newLocation.y >= WINDOW_HEIGHT - FIGURE_SIZE) // when out of bounds vertically
+		{
+			m_stabberKobold[index].setPosition(newLocation.x, oldLocation.y);
+		}
+		else // within bounds movement
+		{
 			m_stabberKobold[index].setPosition(newLocation);
 		}
+		
 	}
 }
 
@@ -482,7 +495,7 @@ void Game::throwerFollowPlayer()
 					newLocation.x -= newVelocity.x;
 				}
 			}
-			if (newLocation.y >= 0.0f && newLocation.y <= WINDOW_WIDTH - FIGURE_SIZE) // bound check y
+			if (newLocation.y >= 0.0f && newLocation.y <= WINDOW_HEIGHT - FIGURE_SIZE) // bound check y
 			{
 				if (newLocation.y > m_player.getPosition().y)
 				{
@@ -561,41 +574,7 @@ void Game::moveArrow()
 	sf::Vector2f newPosition = m_arrow.getPosition();
 	newPosition += m_arrow.getVelocity();
 	m_arrow.setPosition(newPosition);
-}
-
-/// <summary>
-/// checks any sprite if it intersects with another
-/// </summary>
-/// <param name="t_charSprite"> character sprite </param>
-/// <returns> appropriate </returns>
-BlockCheck Game::characterBoundCheck(sf::Sprite t_charSprite)
-{
-	BlockCheck intersection = BlockCheck::unobstructed;
-	bool blockedUp = false;
-	bool blockedRight = false;
-	bool blockedDown = false;
-	bool blocked = false;
-
-	sf::FloatRect characterRect = t_charSprite.getGlobalBounds();
-	for (short index = 0; index < NUMBER_STABBERS; index++)
-	{
-		//check for stabbers
-		/*if (m_stabberKobold[index].getPosition().x < t_position.x + FIGURE_SIZE && m_stabberKobold[index].getPosition().x + FIGURE_SIZE > t_position.x) // check if position is 
-		{
-			if (m_stabberKobold[index].getPosition().y < t_position.y + FIGURE_SIZE && m_stabberKobold[index].getPosition().y + FIGURE_SIZE > t_position.y)
-			{
-				intersection = BlockCheck::intersects;
-			}
-		}
-		*/
-
-		if (m_stabberKobold[index].getSprite().getGlobalBounds().intersects(characterRect) == true) // checks if stabber intersects with other sprite
-		{
-			intersection = BlockCheck::intersects;
-		}
-	}
-
-	return intersection;
+	projectileColDetEnemy(newPosition);
 }
 
 /// <summary>
@@ -642,13 +621,13 @@ bool Game::checkCollisionsVertical(sf::Sprite &t_charSprite)
 				if (koboldHitbox.left + hitBoxWidth > characterHitbox.left && koboldHitbox.left < characterHitbox.left + hitBoxWidth) // checks if x values intersect
 				{
 					intersectsUp = true;
-					if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds to the right
+					if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
 					{
 						newPosition = m_stabberKobold[index].getSprite().getPosition();
 						newPosition.y += 10.0f;
 						m_stabberKobold[index].setPosition(newPosition);
 					}
-					else // shoves Kobolds to the left
+					else // shoves Kobolds downwards
 					{
 						newPosition = m_stabberKobold[index].getSprite().getPosition();
 						newPosition.y -= 10.0f;
@@ -680,13 +659,13 @@ bool Game::checkCollisionsVertical(sf::Sprite &t_charSprite)
 					if (koboldHitbox.left + hitBoxWidth > characterHitbox.left && koboldHitbox.left < characterHitbox.left + hitBoxWidth) // checks if x values intersect
 					{
 						intersectsUp = true;
-						if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds to the right
+						if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
 						{
 							newPosition = m_throwerKobold[index].getSprite().getPosition();
 							newPosition.y += 10.0f;
 							m_throwerKobold[index].setPosition(newPosition);
 						}
-						else // shoves Kobolds to the left
+						else // shoves Kobolds downwards
 						{
 							newPosition = m_throwerKobold[index].getSprite().getPosition();
 							newPosition.y -= 10.0f;
@@ -801,6 +780,63 @@ bool Game::checkCollisionsHorizontal(sf::Sprite &t_charSprite)
 	}
 
 	return intersectsUp;
+}
+
+/// <summary>
+/// checks for projectile collision with enemies
+/// </summary>
+/// <param name="t_position"> position of projectile </param>
+/// <returns> true if it intersects, false if no intersection</returns>
+bool Game::projectileColDetEnemy(sf::Vector2f t_position)
+{
+	bool hit = false;
+	sf::FloatRect koboldHitbox;
+	float hitBoxWidth = 48.0f;
+	float hitBoxHeight = 88.0f;
+
+	for (short index = 0; index < NUMBER_STABBERS; index++)
+	{
+		koboldHitbox = m_stabberKobold[index].getSprite().getGlobalBounds();
+
+		// hitbox modifications
+		koboldHitbox.left += 24.0f;
+		koboldHitbox.width = hitBoxWidth;
+		koboldHitbox.height = hitBoxHeight;
+		koboldHitbox.top += 8.0f;
+
+		if (koboldHitbox.contains(t_position))
+		{
+			hit = true;
+
+			// temporary test
+			m_arrow.setTraveling(false);
+		}
+
+		if (index >= NUMBER_THROWERS)
+		{
+			continue;
+		}
+		else
+		{
+			koboldHitbox = m_throwerKobold[index].getSprite().getGlobalBounds();
+
+			// hitbox modifications
+			koboldHitbox.left += 24.0f;
+			koboldHitbox.width = hitBoxWidth;
+			koboldHitbox.height = hitBoxHeight;
+			koboldHitbox.top += 8.0f;
+
+			if (koboldHitbox.contains(t_position))
+			{
+				hit = true;
+
+				// temporary test
+				m_arrow.setTraveling(false);
+			}
+		}
+	}
+	
+	return hit;
 }
 
 

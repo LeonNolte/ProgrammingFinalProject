@@ -106,14 +106,15 @@ void Player::initializeArrows()
 void Player::shootArrow(Arrow& t_arrow, sf::Vector2i t_direction)
 {
 	sf::Vector2f playerCenter{ 48.0f, 48.0f };
-	
 	sf::Vector2f arrowVelocity;
+
 	arrowVelocity = static_cast<sf::Vector2f>(t_direction) - (m_playerLocation + playerCenter);
 	t_arrow.setPosition(m_playerLocation + playerCenter);
 
 	arrowVelocity = vectorUnitVector(arrowVelocity) * t_arrow.STANDARD_SPEED;
 
 	t_arrow.setVelocity(arrowVelocity);
+	t_arrow.setTraveling(true);
 }
 
 /// <summary>

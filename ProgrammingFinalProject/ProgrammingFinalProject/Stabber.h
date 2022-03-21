@@ -24,6 +24,7 @@ public:
 	int getZigZagCounter();
 	bool isCountingUp();
 	void setPosition(sf::Vector2f t_newPosition);
+	void setPosition(float t_x, float t_y);
 
 	const float stabberStandardSpeed = 1.0f;
 

@@ -78,10 +78,10 @@ private:
 	// projectile movement functions
 	void moveArrow();
 
-	// bound-check functions
-	BlockCheck characterBoundCheck(sf::Sprite t_charSprite);
+	// collision detection functions
 	bool checkCollisionsVertical(sf::Sprite &t_charSprite);
 	bool checkCollisionsHorizontal(sf::Sprite &t_charSprite);
+	bool projectileColDetEnemy(sf::Vector2f t_position);
 
 	// non-character data members
 	sf::RenderWindow m_window; // main SFML window

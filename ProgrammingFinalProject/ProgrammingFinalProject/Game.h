@@ -37,7 +37,7 @@ const unsigned int WINDOW_WIDTH = 1200; // window width
 const unsigned int WINDOW_HEIGHT = 900; // window height
 const unsigned int FIGURE_SIZE = 32 * 3; // size of characters
 const unsigned short NUMBER_STABBERS = 6; // number of Stabber enemies
-const unsigned short NUMBER_THROWERS = 4; // number of throwers
+const unsigned short NUMBER_THROWERS = 1; // number of throwers
 
 class Game
 {

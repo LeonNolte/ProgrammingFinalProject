@@ -65,10 +65,9 @@ bool Thrower::checkInRange(sf::Vector2f t_playerPosition)
 {
 	bool inRange = false;
 	sf::Vector2f lineToPlayer; // line drawn from Kobold to player
-	float range; // range at which Javelin is thrown
+	float range = 450.0f; // range at which Javelin is thrown
 
 	lineToPlayer = m_throwerLocation - t_playerPosition;
-	range = vectorLength(lineToPlayer);a
 
 	if (range > vectorLength(lineToPlayer))
 	{
@@ -85,16 +84,18 @@ bool Thrower::checkInRange(sf::Vector2f t_playerPosition)
 /// </summary>
 /// <param name="t_playerPosition"> position of player </param>
 /// <param name="t_javelin"> pointer at javelin object </param>
-/// <returns> javelin trowing velocity </returns>
-sf::Vector2f Thrower::throwJavelin(sf::Vector2f t_playerPosition, Javelin &t_javelin)
+void Thrower::throwJavelin(sf::Vector2f t_playerPosition, Javelin &t_javelin)
 {
 	sf::Vector2f lineToPlayer; // line drawn to player position
 	sf::Vector2f newVelocity; // new velocity 
+	sf::Vector2f centerOfPlayer{ t_playerPosition.x + static_cast<float>(rand() % 82), t_playerPosition.y + static_cast<float>(rand() % 82) };
 
-	lineToPlayer = m_throwerLocation - t_playerPosition;
+	t_javelin.setPosition(m_throwerLocation.x + 15.0f, m_throwerLocation.y + 15.0f);
+
+	lineToPlayer = centerOfPlayer - m_throwerLocation;
 	newVelocity = vectorUnitVector(lineToPlayer) * t_javelin.STANDARD_SPEED;
 
 	t_javelin.setTraveling(true);
-
-	return newVelocity;
+	t_javelin.setVelocity(newVelocity);
+	t_javelin.setjavSpawn(m_throwerLocation);
 }

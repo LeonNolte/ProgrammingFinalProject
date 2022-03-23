@@ -11,6 +11,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Javelin.h"
+#include <random>
 
 class Thrower
 {
@@ -22,7 +23,7 @@ public:
 	float getSpeed();
 	void setPosition(sf::Vector2f t_newPosition);
 	bool Thrower::checkInRange(sf::Vector2f t_playerPosition);
-	sf::Vector2f throwJavelin(sf::Vector2f t_playerPosition, Javelin& t_javelin);
+	void throwJavelin(sf::Vector2f t_playerPosition, Javelin& t_javelin);
 
 	const float THROWER_MOVE_SPEED = 1.5f;
 

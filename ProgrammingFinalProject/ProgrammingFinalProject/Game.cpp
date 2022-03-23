@@ -478,21 +478,26 @@ void Game::updateThrowers()
 			moveUp(newLocation, newVelocity);
 		}
 
-		
+		// checks for distance to player
 		if (getDistanceToPlayer(newLocation, index, EnemyType::thrower) > 300.0f)
 		{
 				// sets position of Kobold to new location
 				m_throwerKobold[index].setPosition(newLocation);
 		}
 
+		// keeps distance from player
 		throwerKeepDistance(newVelocity, newLocation, index);
-				
+		
+		// adjusts position of Kobold to keep distance
 		m_throwerKobold[index].setPosition(newLocation);
 
 		// check if in range to throw Javelin
 		if (m_throwerKobold[index].checkInRange(m_player.getPosition()) == true)
 		{
-			m_throwerKobold->throwJavelin(m_player.getPosition(), m_javelins[index]);
+			if (m_javelins[index].getTraveling() == false)
+			{
+				m_throwerKobold[index].throwJavelin(m_player.getPosition(), m_javelins[index]);
+			}
 		}
 	}
 }
@@ -652,35 +657,28 @@ bool Game::checkCollisionsVertical(sf::Sprite &t_charSprite)
 			continue;
 		}
 
-		if (koboldHitbox.top + hitBoxHeight > characterHitbox.top) // checks if stabber rectangle is low enough to intersect with sprite
+		if (koboldHitbox.intersects(characterHitbox))
 		{
-			if (koboldHitbox.top < characterHitbox.top + hitBoxHeight) // checks if stabber rectangle is left enough to intersect with sprite
+			intersectsUp = true;
+			if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
 			{
-				if (koboldHitbox.left + hitBoxWidth > characterHitbox.left && koboldHitbox.left < characterHitbox.left + hitBoxWidth) // checks if x values intersect
-				{
-					intersectsUp = true;
-					if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
-					{
-						newPosition = m_stabberKobold[index].getSprite().getPosition();
-						newPosition.y += 10.0f;
-						m_stabberKobold[index].setPosition(newPosition);
-					}
-					else // shoves Kobolds downwards
-					{
-						newPosition = m_stabberKobold[index].getSprite().getPosition();
-						newPosition.y -= 10.0f;
-						m_stabberKobold[index].setPosition(newPosition);
-					}
-				}
+				newPosition = m_stabberKobold[index].getSprite().getPosition();
+				newPosition.y += 10.0f;
+				m_stabberKobold[index].setPosition(newPosition);
+			}
+			else // shoves Kobolds downwards
+			{
+				newPosition = m_stabberKobold[index].getSprite().getPosition();
+				newPosition.y -= 10.0f;
+				m_stabberKobold[index].setPosition(newPosition);
 			}
 		}
 
-		if (index >= NUMBER_THROWERS)
+		if (index >= NUMBER_THROWERS) // checks if index exceedes number of throwers
 		{
 			continue;
 		}
-
-		else
+		else // only checks if index is within thrower array size
 		{
 			koboldHitbox = m_throwerKobold[index].getSprite().getGlobalBounds();
 
@@ -690,26 +688,20 @@ bool Game::checkCollisionsVertical(sf::Sprite &t_charSprite)
 			koboldHitbox.height = hitBoxHeight;
 			koboldHitbox.top += 32.0f;
 
-			if (koboldHitbox.top + hitBoxHeight > characterHitbox.top) // checks if thrower rectangle is low enough to intersect with sprite
+			if (koboldHitbox.intersects(characterHitbox))
 			{
-				if (koboldHitbox.top < characterHitbox.top + hitBoxHeight) // checks if stabber rectangle is left enough to intersect with sprite
+				intersectsUp = true;
+				if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
 				{
-					if (koboldHitbox.left + hitBoxWidth > characterHitbox.left && koboldHitbox.left < characterHitbox.left + hitBoxWidth) // checks if x values intersect
-					{
-						intersectsUp = true;
-						if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
-						{
-							newPosition = m_throwerKobold[index].getSprite().getPosition();
-							newPosition.y += 10.0f;
-							m_throwerKobold[index].setPosition(newPosition);
-						}
-						else // shoves Kobolds downwards
-						{
-							newPosition = m_throwerKobold[index].getSprite().getPosition();
-							newPosition.y -= 10.0f;
-							m_throwerKobold[index].setPosition(newPosition);
-						}
-					}
+					newPosition = m_throwerKobold[index].getSprite().getPosition();
+					newPosition.y += 10.0f;
+					m_throwerKobold[index].setPosition(newPosition);
+				}
+				else // shoves Kobolds downwards
+				{
+					newPosition = m_throwerKobold[index].getSprite().getPosition();
+					newPosition.y -= 10.0f;
+					m_throwerKobold[index].setPosition(newPosition);
 				}
 			}
 		}
@@ -725,7 +717,7 @@ bool Game::checkCollisionsVertical(sf::Sprite &t_charSprite)
 /// <returns> true if it collides, false if it doesn't </returns>
 bool Game::checkCollisionsHorizontal(sf::Sprite &t_charSprite)
 {
-	bool intersectsUp = false;
+	bool intersectsHorizontal = false;
 	sf::FloatRect characterHitbox = t_charSprite.getGlobalBounds();
 	sf::FloatRect koboldHitbox;
 	sf::Vector2f newPosition; // to set location to knock back Kobolds on Impact
@@ -740,9 +732,9 @@ bool Game::checkCollisionsHorizontal(sf::Sprite &t_charSprite)
 	
 	for (short index = 0; index < NUMBER_STABBERS; index++)
 	{
-		koboldHitbox = m_stabberKobold[index].getSprite().getGlobalBounds();
+		koboldHitbox = m_stabberKobold[index].getSprite().getGlobalBounds(); // set up hit box for Kobold
 		
-		// adjustment for kobolds
+		// adjustment for kobold hitboxes
 		koboldHitbox.left += 32.0f;
 		koboldHitbox.width = hitBoxWidth;
 		koboldHitbox.height = hitBoxHeight;
@@ -753,35 +745,27 @@ bool Game::checkCollisionsHorizontal(sf::Sprite &t_charSprite)
 			continue;
 		}
 
-		if (koboldHitbox.left + hitBoxWidth >= characterHitbox.left) // checks if stabber rectangle is left enough to intersect with sprite
+		if (koboldHitbox.intersects(characterHitbox))
 		{
-			if (koboldHitbox.left <= characterHitbox.left + hitBoxWidth) // checks if stabber rectangle is right enough to intersect with sprite
+			intersectsHorizontal = true;
+			if (koboldHitbox.left - characterHitbox.left > hitBoxWidth / 2.0f) // shoves Kobolds to the right
 			{
-				if (koboldHitbox.top + hitBoxHeight > characterHitbox.top && koboldHitbox.top < characterHitbox.top + hitBoxHeight) // checks if x values intersect
-				{
-					intersectsUp = true;
-					if (koboldHitbox.left - characterHitbox.left > hitBoxWidth / 2.0f) // shoves Kobolds to the right
-					{
-						newPosition = m_stabberKobold[index].getSprite().getPosition();
-						newPosition.x += 10.0f;
-						m_stabberKobold[index].setPosition(newPosition);
-					}
-					else // shoves Kobolds to the left
-					{
-						newPosition = m_stabberKobold[index].getSprite().getPosition();
-						newPosition.x -= 10.0f;
-						m_stabberKobold[index].setPosition(newPosition);
-					}
-				}
+				newPosition = m_stabberKobold[index].getSprite().getPosition();
+				newPosition.x += 10.0f;
+				m_stabberKobold[index].setPosition(newPosition);
 			}
-			
+			else // shoves Kobolds to the left
+			{
+				newPosition = m_stabberKobold[index].getSprite().getPosition();
+				newPosition.x -= 10.0f;
+				m_stabberKobold[index].setPosition(newPosition);
+			}			
 		}
 
-		if (index >= NUMBER_THROWERS)
+		if (index >= NUMBER_THROWERS) // skip if index exceedes number of throwers
 		{
 			continue;
 		}
-
 		else
 		{
 			koboldHitbox = m_throwerKobold[index].getSprite().getGlobalBounds();
@@ -792,32 +776,26 @@ bool Game::checkCollisionsHorizontal(sf::Sprite &t_charSprite)
 			koboldHitbox.height = hitBoxHeight;
 			koboldHitbox.top += 32.0f;
 
-			if (koboldHitbox.left + hitBoxWidth > characterHitbox.left) // checks if thrower rectangle is left enough to intersect with sprite
+			if (koboldHitbox.intersects(characterHitbox))
 			{
-				if (koboldHitbox.left < characterHitbox.left + hitBoxWidth) // checks if tgrower rectangle is right enough to intersect with sprite
+				intersectsHorizontal = true;
+				if (koboldHitbox.left - characterHitbox.left > hitBoxWidth / 2.0f) // shoves Kobolds to the right
 				{
-					if (koboldHitbox.top + hitBoxHeight > characterHitbox.top && koboldHitbox.top < characterHitbox.top + hitBoxHeight) // checks if x values intersect
-					{
-						intersectsUp = true;
-						if (koboldHitbox.left - characterHitbox.left > hitBoxWidth / 2.0f) // shoves Kobolds to the right
-						{
-							newPosition = m_throwerKobold[index].getSprite().getPosition();
-							newPosition.x += 10.0f;
-							m_throwerKobold[index].setPosition(newPosition);
-						}
-						else // shoves Kobolds to the left
-						{
-							newPosition = m_throwerKobold[index].getSprite().getPosition();
-							newPosition.x -= 10.0f;
-							m_throwerKobold[index].setPosition(newPosition);
-						}
-					}
+					newPosition = m_throwerKobold[index].getSprite().getPosition();
+						newPosition.x += 10.0f;
+						m_throwerKobold[index].setPosition(newPosition);					
+				}
+				else // shoves Kobolds to the lef
+				{
+					newPosition = m_throwerKobold[index].getSprite().getPosition();
+					newPosition.x -= 10.0f;
+					m_throwerKobold[index].setPosition(newPosition);
 				}
 			}
 		}
 	}
 
-	return intersectsUp;
+	return intersectsHorizontal;
 }
 
 /// <summary>

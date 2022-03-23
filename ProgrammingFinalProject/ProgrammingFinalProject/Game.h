@@ -70,10 +70,14 @@ private:
 	void moveDown(sf::Vector2f& t_position, sf::Vector2f t_velocity);
 	void moveLeft(sf::Vector2f& t_position, sf::Vector2f t_velocity);
 	void moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity);
-	void stabberFollowPlayer();
-	void throwerFollowPlayer();
+
+	void updateStabbers();
+	void updateThrowers();
+	void throwerKeepDistance(sf::Vector2f &t_velocity, sf::Vector2f &t_location, int index);
+	void updateEnemies();
+
 	float getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, EnemyType t_enemy);
-	void enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_enemy);
+	void enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex);
 	
 	// projectile movement functions
 	void moveArrow();
@@ -93,16 +97,14 @@ private:
 
 	// object related data members
 	EnemyType enemy = EnemyType::stabber; // basic enemy type enum
-	sf::Vector2f m_arrowVelocity;
 
 	// objects
 	Player m_player; // Player object
 	Stabber m_stabberKobold[NUMBER_STABBERS]; // array of Stabber Kobolds
 	Thrower m_throwerKobold[NUMBER_THROWERS]; // array of thrower Kobolds
+	Javelin m_javelins[NUMBER_THROWERS]; // array of Javelins for throwers
 	Arrow m_arrow; // arrow object
-
 	
-
 };
 
 #endif // !GAME_HPP

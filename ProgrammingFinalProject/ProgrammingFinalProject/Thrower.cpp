@@ -10,8 +10,6 @@
 
 Thrower::Thrower()
 {
-	m_throwerLocation = { 200.0f, 10.0f };
-
 	if (!m_throwerTexture.loadFromFile("ASSETS\\IMAGES\\Thrower.png"))
 	{
 		std::cout << "problem loading thrower texture" << std::endl;
@@ -46,7 +44,7 @@ sf::Vector2f Thrower::getPosition()
 /// <returns> standard speed </returns>
 float Thrower::getSpeed()
 {
-	return throwerStandardSpeed;
+	return THROWER_MOVE_SPEED;
 }
 
 /// <summary>
@@ -56,4 +54,47 @@ void Thrower::setPosition(sf::Vector2f t_newPosition)
 {
 	m_throwerLocation = t_newPosition;
 	m_throwerSprite.setPosition(t_newPosition);
+}
+
+/// <summary>
+/// checks if Thrower is in range to throw Javelin
+/// throws Javelin when in range
+/// </summary>
+/// <returns> true when in range/ false when not in range </returns>
+bool Thrower::checkInRange(sf::Vector2f t_playerPosition)
+{
+	bool inRange = false;
+	sf::Vector2f lineToPlayer; // line drawn from Kobold to player
+	float range; // range at which Javelin is thrown
+
+	lineToPlayer = m_throwerLocation - t_playerPosition;
+	range = vectorLength(lineToPlayer);a
+
+	if (range > vectorLength(lineToPlayer))
+	{
+		inRange = true;
+	}
+
+	return inRange;
+}
+
+
+/// <summary>
+/// throw Javelin at player
+/// gets line to player , turns it into unit vector and multiplies it with Javelin velocity
+/// </summary>
+/// <param name="t_playerPosition"> position of player </param>
+/// <param name="t_javelin"> pointer at javelin object </param>
+/// <returns> javelin trowing velocity </returns>
+sf::Vector2f Thrower::throwJavelin(sf::Vector2f t_playerPosition, Javelin &t_javelin)
+{
+	sf::Vector2f lineToPlayer; // line drawn to player position
+	sf::Vector2f newVelocity; // new velocity 
+
+	lineToPlayer = m_throwerLocation - t_playerPosition;
+	newVelocity = vectorUnitVector(lineToPlayer) * t_javelin.STANDARD_SPEED;
+
+	t_javelin.setTraveling(true);
+
+	return newVelocity;
 }

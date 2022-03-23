@@ -144,8 +144,8 @@ void Game::update(sf::Time t_deltaTime)
 		movePlayer(Direction::Right);
 	}
 
-	stabberFollowPlayer();
-	throwerFollowPlayer();
+	updateEnemies();
+
 	if (m_arrow.getTraveling() == true)
 	{
 		moveArrow();
@@ -160,6 +160,7 @@ void Game::render()
 	m_window.clear(sf::Color::White);
 	m_window.draw(m_backgroundSprite);
 	m_window.draw(m_player.getSprite());
+
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
 		m_window.draw(m_stabberKobold[index].getSprite());
@@ -171,9 +172,15 @@ void Game::render()
 		else
 		{
 			m_window.draw(m_throwerKobold[index].getSprite());
+			m_window.draw(m_javelins[index].getSprite());
 		}
 	}
-	m_window.draw(m_arrow.getSprite());
+
+	if (m_arrow.getTraveling() == true)
+	{
+		m_window.draw(m_arrow.getSprite());
+	}
+
 	m_window.display();
 	
 }
@@ -219,7 +226,7 @@ void Game::setupObjects()
 	sf::Vector2f stabberSpawn2{ WINDOW_WIDTH - 150.0f, 150.0f };
 	sf::Vector2f throwerSpawn{ WINDOW_WIDTH - 100.0f, 100.0f };
 
-	m_player.setPosition(100.0f, 100.0f);
+	m_player.setPosition(WINDOW_WIDTH / 2.0f,	WINDOW_HEIGHT / 1.5F);
 	
 	for (short index = 0; index < NUMBER_STABBERS; index++) // for now: one loop for throwers and stabbers
 	{
@@ -382,7 +389,7 @@ void Game::moveRight(sf::Vector2f& t_position, sf::Vector2f t_velocity)
 /// <summary>
 /// function to make all stabbers follow the player
 /// </summary>
-void Game::stabberFollowPlayer()
+void Game::updateStabbers()
 {
 	sf::Vector2f newVelocity; // new velocity of Kobold
 	sf::Vector2f newLocation; // sets new location of stabber
@@ -417,7 +424,7 @@ void Game::stabberFollowPlayer()
 		}
 
 		// call zig-zag function
-		enemyZigZag(newLocation, index, EnemyType::stabber);
+		enemyZigZag(newLocation, index);
 
 		// sets position of Kobold to new location
 		if (newLocation.x <= 0.0f || newLocation.x >= WINDOW_WIDTH - FIGURE_SIZE) // when out of bounds horizontally
@@ -440,7 +447,7 @@ void Game::stabberFollowPlayer()
 /// follow player function for thrower Kobolds
 /// Follow the player up until certain distance, then hover until throwing their spears
 /// </summary>
-void Game::throwerFollowPlayer()
+void Game::updateThrowers()
 {
 	sf::Vector2f newVelocity; // new velocity of thrower Kobold
 	sf::Vector2f newLocation; // sets new location of thrower Kobold
@@ -478,36 +485,68 @@ void Game::throwerFollowPlayer()
 				m_throwerKobold[index].setPosition(newLocation);
 		}
 
-		
-		if (getDistanceToPlayer(newLocation, index, EnemyType::thrower) < 200.0f) // if player gets too close
-		{
-			newVelocity *= 2.0f; // to negate previous movement
-
-			// reverse movement to follow player
-			if (newLocation.x >= 0.0f && newLocation.x <= WINDOW_WIDTH - FIGURE_SIZE) // basic bound check
-			{
-				if (newLocation.x > m_player.getPosition().x)
-				{
-					newLocation.x += newVelocity.x;
-				}
-				else
-				{
-					newLocation.x -= newVelocity.x;
-				}
-			}
-			if (newLocation.y >= 0.0f && newLocation.y <= WINDOW_HEIGHT - FIGURE_SIZE) // bound check y
-			{
-				if (newLocation.y > m_player.getPosition().y)
-				{
-					newLocation.y += newVelocity.y;
-				}
-				else
-				{
-					newLocation.y -= newVelocity.y;
-				}
-			}
+		throwerKeepDistance(newVelocity, newLocation, index);
 				
-			m_throwerKobold[index].setPosition(newLocation);
+		m_throwerKobold[index].setPosition(newLocation);
+
+		// check if in range to throw Javelin
+		if (m_throwerKobold[index].checkInRange(m_player.getPosition()) == true)
+		{
+			m_throwerKobold->throwJavelin(m_player.getPosition(), m_javelins[index]);
+		}
+	}
+}
+
+/// <summary>
+/// checks to keep distance to player
+/// </summary>
+/// <param name="t_velocity"> pointer to velocity of Kobold </param>
+/// <param name="t_location"> pointer to location of Kobold </param>
+/// <param name="index"> index of Kobold </param>
+void Game::throwerKeepDistance(sf::Vector2f &t_velocity, sf::Vector2f &t_location, int index)
+{
+	if (getDistanceToPlayer(t_location, index, EnemyType::thrower) < 200.0f) // if player gets too close
+	{
+		t_velocity *= 2.0f; // to negate previous Kobold movement
+
+		// reverse movement to follow player
+		if (t_location.x >= 0.0f && t_location.x <= WINDOW_WIDTH - FIGURE_SIZE) // basic bound check x
+		{
+			if (t_location.x > m_player.getPosition().x)
+			{
+				t_location.x += t_velocity.x;
+			}
+			else
+			{
+				t_location.x -= t_velocity.x;
+			}
+		}
+		if (t_location.y >= 0.0f && t_location.y <= WINDOW_HEIGHT - FIGURE_SIZE) // bound check y
+		{
+			if (t_location.y > m_player.getPosition().y)
+			{
+				t_location.y += t_velocity.y;
+			}
+			else
+			{
+				t_location.y -= t_velocity.y;
+			}
+		}
+	}
+}
+
+/// <summary>
+/// updates enemies and their projectiles
+/// </summary>
+void Game::updateEnemies()
+{
+	updateStabbers();
+	updateThrowers();
+	for (int index = 0; index < NUMBER_THROWERS; index++)
+	{
+		if (m_javelins[index].getTraveling() == true)
+		{
+			m_javelins[index].travel();
 		}
 	}
 }
@@ -543,26 +582,23 @@ float Game::getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, Enem
 /// <param name="t_position"> position of Kobold </param>
 /// <param name="t_arrayIndex"> array ID of Kobold </param>
 /// <param name="t_enemy"> type of Kobold </param>
-void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_enemy)
+void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex)
 {
 	sf::Vector2f lineToPlayer; // line drawn from stabber to player
 	sf::Vector2f zigZagStep; // zig zag movement for next frame
 
-	if (t_enemy == EnemyType::stabber)
-	{
-		// for zig zag
-		lineToPlayer = (m_player.getPosition() - m_stabberKobold[t_arrayIndex].getPosition()); // draws line between stabber and player as vector
+	// for zig zag
+	lineToPlayer = (m_player.getPosition() - m_stabberKobold[t_arrayIndex].getPosition()); // draws line between stabber and player as vector
 
-		if (m_stabberKobold[t_arrayIndex].getZigZagCounter() < 0)
-		{
-			zigZagStep = { -2.0f, -2.0f };
-		}
-		else
-		{
-			zigZagStep = { 2.0f, 2.0f };
-		}
+	if (m_stabberKobold[t_arrayIndex].getZigZagCounter() < 0)
+	{
+		zigZagStep = { -2.0f, -2.0f };
 	}
-	
+	else
+	{
+		zigZagStep = { 2.0f, 2.0f };
+	}
+
 	t_position += vectorRejection(zigZagStep, lineToPlayer); // rejects zig zag step from line to player
 }
 
@@ -572,9 +608,11 @@ void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex, EnemyType t_e
 void Game::moveArrow()
 {
 	sf::Vector2f newPosition = m_arrow.getPosition();
+
 	newPosition += m_arrow.getVelocity();
 	m_arrow.setPosition(newPosition);
-	projectileColDetEnemy(newPosition);
+
+	projectileColDetEnemy(newPosition); // checks for collision with enemy
 }
 
 /// <summary>

@@ -14,6 +14,7 @@
 /// Session 9: 17:30 - 20:15 (19/03/22)
 /// Session 10: 13:15 - 16:15 (20/03/22)
 /// Session 11: 9:30 - 10:45 (21/03/22)
+/// Session 12: 9:40 - 11:00 (23/03/22)
 /// -----------------------------------------------------------------------------
 /// Simple game in which the player takes control over an archer, who is fending of waves of Kobolds.
 /// Move using WASD, shoot by clicking the left mouse button.

@@ -28,10 +28,13 @@ public:
 	sf::Vector2f getVelocity();
 	void setPosition(float t_x, float t_y);
 	void setPosition(sf::Vector2f t_newPosition);
+
 	void setVelocity(float t_x, float t_y);
 	void setVelocity(sf::Vector2f t_newVelocity);
 
 	sf::Sprite getSprite();
+	void setSprite(sf::Sprite t_newSprite) { m_playerSprite = t_newSprite; };
+
 	void newTextureRect(sf::IntRect t_textureRect);
 
 	void initializeArrows();

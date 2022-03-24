@@ -22,6 +22,8 @@ public:
 	void setTraveling(bool t_travelStatus);
 	bool getTraveling();
 
+	void travel();
+
 	sf::CircleShape getSprite() { return m_arrowHitBox; }; // hit box as stand-in for sprite
 
 	const float STANDARD_SPEED = 10.0f;

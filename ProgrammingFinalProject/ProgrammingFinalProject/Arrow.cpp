@@ -75,3 +75,14 @@ bool Arrow::getTraveling()
 {
 	return m_traveling;
 }
+
+/// <summary>
+/// moves arrow
+/// </summary>
+void Arrow::travel()
+{
+	sf::Vector2f newPosition = getPosition();
+
+	newPosition += getVelocity();
+	setPosition(newPosition);
+}

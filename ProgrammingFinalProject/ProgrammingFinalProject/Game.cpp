@@ -148,7 +148,7 @@ void Game::update(sf::Time t_deltaTime)
 
 	if (m_arrow.getTraveling() == true)
 	{
-		moveArrow();
+		updateArrow();
 	}
 }
 
@@ -262,6 +262,7 @@ void Game::movePlayer(Direction t_direction)
 {
 	sf::Vector2f newPosition = m_player.getPosition();
 	sf::Vector2f newVelocity = m_player.getVelocity();
+	sf::Sprite tempSprite = m_player.getSprite();
 	
 	
 	switch (t_direction)
@@ -277,7 +278,7 @@ void Game::movePlayer(Direction t_direction)
 			newVelocity.y = 0.1f;
 		}
 		moveUp(newPosition, newVelocity);
-		m_player.newTextureRect(sf::IntRect(32, 0, 32, 32));
+		animateCharacter(tempSprite, Direction::Down);
 		break;
 	case Direction::Down:
 		if (checkCollisionsVertical(m_player.getSprite()) == false)
@@ -317,8 +318,10 @@ void Game::movePlayer(Direction t_direction)
 		break;
 	}
 
+	m_player.setSprite(tempSprite);
 	m_player.setVelocity(newVelocity);
 	m_player.setPosition(newPosition);
+	
 
 }
 
@@ -608,17 +611,113 @@ void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex)
 }
 
 /// <summary>
-/// moves arrow
+/// animates a character sprite the size of 32x32
 /// </summary>
-void Game::moveArrow()
+/// <param name="t_sprite"></param>
+/// <param name="t_texture"></param>
+void Game::animateCharacter(sf::Sprite& t_sprite, Direction t_movementDirection)
 {
-	sf::Vector2f newPosition = m_arrow.getPosition();
+	short counter = 0;
 
-	newPosition += m_arrow.getVelocity();
-	m_arrow.setPosition(newPosition);
+	if (t_movementDirection == Direction::Down)
+	{
+		if (counter < 4)
+		{
+			t_sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+		}
+		else if (counter < 8)
+		{
+			t_sprite.setTextureRect(sf::IntRect(0, 32, 32, 32));
+		}
+		else if (counter < 12)
+		{
+			t_sprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
+		}
+		else if (counter < 16)
+		{
+			t_sprite.setTextureRect(sf::IntRect(0, 96, 32, 32));
+		}
+	}
 
-	projectileColDetEnemy(newPosition); // checks for collision with enemy
+	if (t_movementDirection == Direction::Up)
+	{
+		if (counter < 4)
+		{
+			t_sprite.setTextureRect(sf::IntRect(32, 0, 32, 32));
+		}
+		else if (counter < 8)
+		{
+			t_sprite.setTextureRect(sf::IntRect(32, 32, 32, 32));
+		}
+		else if (counter < 12)
+		{
+			t_sprite.setTextureRect(sf::IntRect(32, 64, 32, 32));
+		}
+		else if (counter < 16)
+		{
+			t_sprite.setTextureRect(sf::IntRect(32, 96, 32, 32));
+		}
+	}
+
+	if (t_movementDirection == Direction::Right)
+	{
+		if (counter < 4)
+		{
+			t_sprite.setTextureRect(sf::IntRect(64, 0, 32, 32));
+		}
+		else if (counter < 8)
+		{
+			t_sprite.setTextureRect(sf::IntRect(64, 32, 32, 32));
+		}
+		else if (counter < 12)
+		{
+			t_sprite.setTextureRect(sf::IntRect(64, 64, 32, 32));
+		}
+		else if (counter < 16)
+		{
+			t_sprite.setTextureRect(sf::IntRect(64, 96, 32, 32));
+		}
+	}
+
+	if (t_movementDirection == Direction::Left)
+	{
+		if (counter < 4)
+		{
+			t_sprite.setTextureRect(sf::IntRect(96, 0, 32, 32));
+		}
+		else if (counter < 8)
+		{
+			t_sprite.setTextureRect(sf::IntRect(96, 32, 32, 32));
+		}
+		else if (counter < 12)
+		{
+			t_sprite.setTextureRect(sf::IntRect(96, 64, 32, 32));
+		}
+		else if (counter < 16)
+		{
+			t_sprite.setTextureRect(sf::IntRect(96, 96, 32, 32));
+		}
+	}
+
+	counter += 1;
+
+	if (counter == 15) // reset counter
+	{
+		counter = 0;
+	}
 }
+
+/// <summary>
+/// updates arrow
+/// contains movement and hitbox detection calls
+/// </summary>
+void Game::updateArrow()
+{
+	m_arrow.travel();
+	arrowHitDetection(m_arrow.getPosition()); // checks for collision with enemy
+}
+
+
 
 /// <summary>
 /// checks for collisions with other sprites north
@@ -803,7 +902,7 @@ bool Game::checkCollisionsHorizontal(sf::Sprite &t_charSprite)
 /// </summary>
 /// <param name="t_position"> position of projectile </param>
 /// <returns> true if it intersects, false if no intersection</returns>
-bool Game::projectileColDetEnemy(sf::Vector2f t_position)
+bool Game::arrowHitDetection(sf::Vector2f t_position)
 {
 	bool hit = false;
 	sf::FloatRect koboldHitbox;

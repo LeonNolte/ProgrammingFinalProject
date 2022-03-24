@@ -78,14 +78,19 @@ private:
 
 	float getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, EnemyType t_enemy);
 	void enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex);
+
+	// animation functions
+	void animateCharacter(sf::Sprite &t_sprite, Direction t_movementDirection);
 	
-	// projectile movement functions
-	void moveArrow();
+	// projectile update functions
+	void updateArrow();
+	void updateJavelin(Javelin &t_javelin);
 
 	// collision detection functions
 	bool checkCollisionsVertical(sf::Sprite &t_charSprite);
 	bool checkCollisionsHorizontal(sf::Sprite &t_charSprite);
-	bool projectileColDetEnemy(sf::Vector2f t_position);
+	bool arrowHitDetection(sf::Vector2f t_position);
+	bool javelinHitDetecion(sf::Vector2f t_position);
 
 	// non-character data members
 	sf::RenderWindow m_window; // main SFML window

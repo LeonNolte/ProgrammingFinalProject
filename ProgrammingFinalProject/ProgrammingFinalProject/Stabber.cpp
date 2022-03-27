@@ -49,7 +49,7 @@ sf::Vector2f Stabber::getPosition()
 /// <returns> standard speed </returns>
 float Stabber::getSpeed()
 {
-	return stabberStandardSpeed;
+	return STABBER_SPEED;
 }
 
 /// <summary>
@@ -82,10 +82,17 @@ int Stabber::getZigZagCounter()
 /// <summary>
 /// gets counting status
 /// </summary>
-/// <returns></returns>
 bool Stabber::isCountingUp()
 {
 	return m_countingUp;
+}
+
+/// <summary>
+/// resets Kobold when hit
+/// </summary>
+void Stabber::die()
+{
+	m_alive = false;
 }
 
 /// <summary>

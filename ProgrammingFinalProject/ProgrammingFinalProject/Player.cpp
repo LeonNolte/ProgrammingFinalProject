@@ -27,6 +27,8 @@ Player::Player()
 	m_playerSprite.setScale(3.0f, 3.0f);
 
 	m_playerVelocity = { 0.0f, 0.0f };
+
+	m_playerHealth = 100;
 }
 
 sf::Vector2f Player::getPosition()
@@ -115,6 +117,17 @@ void Player::shootArrow(Arrow& t_arrow, sf::Vector2i t_direction)
 
 	t_arrow.setVelocity(arrowVelocity);
 	t_arrow.setTraveling(true);
+}
+
+/// <summary>
+/// makes player take damage
+/// </summary>
+/// <param name="t_damage"> damage taken </param>
+void Player::takeDamage(short t_damage)
+{
+	m_playerHealth -= t_damage;
+
+	// if healtn > 0 replay game
 }
 
 /// <summary>

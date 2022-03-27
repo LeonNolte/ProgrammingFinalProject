@@ -48,6 +48,17 @@ float Thrower::getSpeed()
 }
 
 /// <summary>
+/// increments and returns wait counter (before throwing javelin)
+/// </summary>
+/// <returns> wait counter </returns>
+short Thrower::incrementWaitCounter()
+{
+	m_waitCounter++;
+
+	return m_waitCounter;
+}
+
+/// <summary>
 /// sets position of Stabber Kobold
 /// </summary>
 void Thrower::setPosition(sf::Vector2f t_newPosition)
@@ -64,8 +75,9 @@ void Thrower::setPosition(sf::Vector2f t_newPosition)
 bool Thrower::checkInRange(sf::Vector2f t_playerPosition)
 {
 	bool inRange = false;
+
 	sf::Vector2f lineToPlayer; // line drawn from Kobold to player
-	float range = 450.0f; // range at which Javelin is thrown
+	float range = 350.0f; // range at which Javelin is thrown
 
 	lineToPlayer = m_throwerLocation - t_playerPosition;
 
@@ -98,4 +110,14 @@ void Thrower::throwJavelin(sf::Vector2f t_playerPosition, Javelin &t_javelin)
 	t_javelin.setTraveling(true);
 	t_javelin.setVelocity(newVelocity);
 	t_javelin.setjavSpawn(m_throwerLocation);
+
+	m_following = false;
+}
+
+/// <summary>
+/// resets kobold
+/// </summary>
+void Thrower::die()
+{
+	m_alive = false;
 }

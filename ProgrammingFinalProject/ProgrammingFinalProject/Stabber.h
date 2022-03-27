@@ -18,15 +18,25 @@ class Stabber
 public:
 
 	Stabber();
+
+	// get functions
 	sf::Sprite getSprite();
 	sf::Vector2f getPosition();
 	float getSpeed();
 	int getZigZagCounter();
+	bool getAlive() { return m_alive; };
+
 	bool isCountingUp();
+	void die();
+
+	// set functions
 	void setPosition(sf::Vector2f t_newPosition);
 	void setPosition(float t_x, float t_y);
+	void setAlive(bool t_alive) { m_alive = t_alive; };
 
-	const float stabberStandardSpeed = 1.0f;
+	const float STABBER_SPEED = 1.5f;
+	const short DAMAGE = 10;
+
 
 private:
 
@@ -36,6 +46,7 @@ private:
 
 	int m_zigZagCounter;
 	bool m_countingUp = true;
+	bool m_alive = true;
 
 };
 

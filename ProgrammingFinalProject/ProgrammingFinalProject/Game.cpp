@@ -503,6 +503,12 @@ void Game::updateThrowers()
 				m_throwerKobold[index].throwJavelin(m_player.getPosition(), m_javelins[index]);
 			}
 		}
+
+		// check if Javelin hit player when thrown
+		if (m_javelins[index].getTraveling() == true)
+		{
+			updateJavelin(m_javelins[index]);
+		}
 	}
 }
 
@@ -712,6 +718,22 @@ void Game::updateArrow()
 {
 	m_arrow.travel();
 	arrowHitDetection(m_arrow.getPosition()); // checks for collision with enemy
+}
+
+/// <summary>
+/// updates javelins
+/// </summary>
+/// <param name="t_javelin"></param>
+void Game::updateJavelin(Javelin& t_javelin)
+{
+	bool hitPlayer = false;
+
+	hitPlayer = javelinHitDetecion(t_javelin.getPosition());
+
+	if (hitPlayer == true)
+	{
+		t_javelin.setTraveling(false);
+	}
 }
 
 
@@ -949,6 +971,27 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 	}
 	
 	return hit;
+}
+
+/// <summary>
+/// checks if Javelins hits Player
+/// </summary>
+/// <param name="t_position"> position of Javelin </param>
+/// <returns> true if hit, false if no hit </returns>
+bool Game::javelinHitDetecion(sf::Vector2f t_position)
+{
+	bool hitPlayer = false;
+	sf::FloatRect playerHitbox = m_player.getSprite().getGlobalBounds();
+
+	playerHitbox.left += 24.0f;
+	playerHitbox.width = 48.0f;
+
+	if (playerHitbox.contains(t_position) == true)
+	{
+		hitPlayer = true;
+	}
+
+	return hitPlayer;
 }
 
 

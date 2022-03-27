@@ -99,9 +99,11 @@ private:
 	sf::Texture m_backgroundTexture; // texture used for sfml logo
 	sf::Sprite m_backgroundSprite; // sprite used for background
 	bool m_exitGame; // control exiting game
+	int animationCounter = 0; // counter to manage animation
 
 	// object related data members
 	EnemyType enemy = EnemyType::stabber; // basic enemy type enum
+
 
 	// objects
 	Player m_player; // Player object

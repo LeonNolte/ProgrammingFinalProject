@@ -17,7 +17,7 @@ Player::Player()
 	m_playerCenterLocation = { m_playerLocation.x + 48.0f, m_playerLocation.y + 48.0f }; // (sprite sheet resolution / 2) * figure scaling (3) --> (32px / 2) * 3 = 48
 	m_playerSprite.setPosition(m_playerLocation);
 
-	if (!m_playerTexture.loadFromFile("ASSETS\\IMAGES\\ArcherSpritesheet_New.png"))
+	if (!m_playerTexture.loadFromFile("ASSETS\\IMAGES\\ArcherAnimationSprite.png"))
 	{
 		std::cout << "problem loading player texture" << std::endl;
 	}

@@ -144,6 +144,8 @@ void Game::update(sf::Time t_deltaTime)
 		movePlayer(Direction::Right);
 	}
 
+	animationCounter++;
+
 	updateEnemies();
 
 	if (m_arrow.getTraveling() == true)
@@ -264,7 +266,6 @@ void Game::movePlayer(Direction t_direction)
 	sf::Vector2f newVelocity = m_player.getVelocity();
 	sf::Sprite tempSprite = m_player.getSprite();
 	
-	
 	switch (t_direction)
 	{
 	case Direction::Up:
@@ -278,7 +279,7 @@ void Game::movePlayer(Direction t_direction)
 			newVelocity.y = 0.1f;
 		}
 		moveUp(newPosition, newVelocity);
-		animateCharacter(tempSprite, Direction::Down);
+		animateCharacter(tempSprite, Direction::Up);
 		break;
 	case Direction::Down:
 		if (checkCollisionsVertical(m_player.getSprite()) == false)
@@ -290,7 +291,7 @@ void Game::movePlayer(Direction t_direction)
 			newVelocity.y = 0.1f;
 		}
 		moveDown(newPosition, newVelocity);
-		m_player.newTextureRect(sf::IntRect(0, 0, 32, 32));
+		animateCharacter(tempSprite, Direction::Down);
 		break;
 	case Direction::Left:
 		if (checkCollisionsHorizontal(m_player.getSprite()) == false)
@@ -302,7 +303,7 @@ void Game::movePlayer(Direction t_direction)
 			newVelocity.x = 0.1f;
 		}
 		moveLeft(newPosition, newVelocity);
-		m_player.newTextureRect(sf::IntRect(64, 0, 32, 32));
+		animateCharacter(tempSprite, Direction::Left);
 		break;
 	case Direction::Right:
 		if (checkCollisionsHorizontal(m_player.getSprite()) == false)
@@ -314,7 +315,7 @@ void Game::movePlayer(Direction t_direction)
 			newVelocity.x = 0.1f;
 		}
 		moveRight(newPosition, newVelocity);
-		m_player.newTextureRect(sf::IntRect(96, 0, 32, 32));
+		animateCharacter(tempSprite, Direction::Right);
 		break;
 	}
 
@@ -617,23 +618,21 @@ void Game::enemyZigZag(sf::Vector2f &t_position, int t_arrayIndex)
 /// <param name="t_texture"></param>
 void Game::animateCharacter(sf::Sprite& t_sprite, Direction t_movementDirection)
 {
-	short counter = 0;
-
 	if (t_movementDirection == Direction::Down)
 	{
-		if (counter < 4)
+		if (animationCounter < 8)
 		{
 			t_sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
 		}
-		else if (counter < 8)
+		else if (animationCounter < 16)
 		{
 			t_sprite.setTextureRect(sf::IntRect(0, 32, 32, 32));
 		}
-		else if (counter < 12)
+		else if (animationCounter < 24)
 		{
 			t_sprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
 		}
-		else if (counter < 16)
+		else if (animationCounter < 32)
 		{
 			t_sprite.setTextureRect(sf::IntRect(0, 96, 32, 32));
 		}
@@ -641,19 +640,19 @@ void Game::animateCharacter(sf::Sprite& t_sprite, Direction t_movementDirection)
 
 	if (t_movementDirection == Direction::Up)
 	{
-		if (counter < 4)
+		if (animationCounter < 8)
 		{
 			t_sprite.setTextureRect(sf::IntRect(32, 0, 32, 32));
 		}
-		else if (counter < 8)
+		else if (animationCounter < 16)
 		{
 			t_sprite.setTextureRect(sf::IntRect(32, 32, 32, 32));
 		}
-		else if (counter < 12)
+		else if (animationCounter < 24)
 		{
 			t_sprite.setTextureRect(sf::IntRect(32, 64, 32, 32));
 		}
-		else if (counter < 16)
+		else if (animationCounter < 32)
 		{
 			t_sprite.setTextureRect(sf::IntRect(32, 96, 32, 32));
 		}
@@ -661,19 +660,19 @@ void Game::animateCharacter(sf::Sprite& t_sprite, Direction t_movementDirection)
 
 	if (t_movementDirection == Direction::Right)
 	{
-		if (counter < 4)
+		if (animationCounter < 8)
 		{
 			t_sprite.setTextureRect(sf::IntRect(64, 0, 32, 32));
 		}
-		else if (counter < 8)
+		else if (animationCounter < 16)
 		{
 			t_sprite.setTextureRect(sf::IntRect(64, 32, 32, 32));
 		}
-		else if (counter < 12)
+		else if (animationCounter < 24)
 		{
 			t_sprite.setTextureRect(sf::IntRect(64, 64, 32, 32));
 		}
-		else if (counter < 16)
+		else if (animationCounter < 32)
 		{
 			t_sprite.setTextureRect(sf::IntRect(64, 96, 32, 32));
 		}
@@ -681,29 +680,27 @@ void Game::animateCharacter(sf::Sprite& t_sprite, Direction t_movementDirection)
 
 	if (t_movementDirection == Direction::Left)
 	{
-		if (counter < 4)
+		if (animationCounter < 8)
 		{
 			t_sprite.setTextureRect(sf::IntRect(96, 0, 32, 32));
 		}
-		else if (counter < 8)
+		else if (animationCounter < 16)
 		{
 			t_sprite.setTextureRect(sf::IntRect(96, 32, 32, 32));
 		}
-		else if (counter < 12)
+		else if (animationCounter < 24)
 		{
 			t_sprite.setTextureRect(sf::IntRect(96, 64, 32, 32));
 		}
-		else if (counter < 16)
+		else if (animationCounter < 32)
 		{
 			t_sprite.setTextureRect(sf::IntRect(96, 96, 32, 32));
 		}
 	}
 
-	counter += 1;
-
-	if (counter == 15) // reset counter
+	if (animationCounter == 32) // reset counter
 	{
-		counter = 0;
+		animationCounter = 0;
 	}
 }
 

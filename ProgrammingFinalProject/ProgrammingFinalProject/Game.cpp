@@ -160,7 +160,7 @@ void Game::render()
 		}
 		else
 		{
-			if (m_throwerKobold[index].getAlive() == true)
+			if (m_throwerKobold[index].getStatus() != Status::dead)
 			{
 				m_window.draw(m_throwerKobold[index].getSprite());
 			}
@@ -219,35 +219,7 @@ void Game::setupSprite()
 /// </summary>
 void Game::setupObjects()
 {
-	sf::Vector2f stabberSpawn1{ 100.0f, 20.0f };
-	sf::Vector2f stabberSpawn2{ WINDOW_WIDTH - 150.0f, 150.0f };
-	sf::Vector2f throwerSpawn{ WINDOW_WIDTH - 100.0f, 100.0f };
-
-	m_player.setPosition(WINDOW_WIDTH / 2.0f,	WINDOW_HEIGHT / 1.5F);
-	
-	for (short index = 0; index < NUMBER_STABBERS; index++) // for now: one loop for throwers and stabbers
-	{
-		if (index % 2 == 0)
-		{
-			m_stabberKobold[index].setPosition(stabberSpawn1);
-			stabberSpawn1.y += 200.0f;
-		}
-		if (index % 2 == 1)
-		{
-			m_stabberKobold[index].setPosition(stabberSpawn2);
-			stabberSpawn2.y += 200.0f;
-		}
-		if (index > NUMBER_THROWERS - 1)
-		{
-			continue;
-		}
-		else
-		{
-			m_throwerKobold[index].setPosition(throwerSpawn);
-			throwerSpawn.y += 150.0f;
-		}
-		
-	}
+	spawnWave1();
 }
 
 /// <summary>
@@ -491,11 +463,11 @@ void Game::updateThrowers()
 	
 	for (int index = 0; index < NUMBER_THROWERS; index++)
 	{
-		if (m_throwerKobold[index].getAlive() == true) // only updates if Kobold is alive
+		if (m_throwerKobold[index].getStatus() != Status::dead) // only updates if Kobold is alive
 		{
 			newLocation = m_throwerKobold[index].getPosition();
 
-			if (m_throwerKobold[index].getFollowing() == true) // follows player when true
+			if (m_throwerKobold[index].getStatus() == Status::following) // follows player when true
 			{
 				// for following
 				if (m_player.getPosition().x > m_throwerKobold[index].getPosition().x)
@@ -530,13 +502,17 @@ void Game::updateThrowers()
 					}
 				}
 			}
-			else // runs away when javelin is thrown (following == false)
+			else if (m_throwerKobold[index].getStatus() == Status::fleeing) // runs away when javelin is thrown (following == false)
 			{
-				if (m_throwerKobold[index].getAlive() == true && checkDespawnThrower(newLocation) == false) // 
+				if (m_throwerKobold[index].getStatus() != Status::dead && checkDespawnThrower(newLocation) == false) // 
 				{
 					newVelocity = { 0.8f, 0.8f };
 					throwerRunAway(newVelocity, newLocation);
 				}
+			}
+			else if (m_throwerKobold[index].getStatus() == Status::entering)
+			{
+				throwerEnter(index);
 			}
 		}
 		
@@ -612,6 +588,43 @@ void Game::throwerRunAway(sf::Vector2f& t_velocity, sf::Vector2f& t_location)
 	{
 		t_location.y -= t_velocity.y;
 	}
+}
+
+/// <summary>
+/// makes thrower enter the playing field
+/// </summary>
+/// <param name="t_velocity"> </param>
+/// <param name="t_location"></param>
+void Game::throwerEnter(short t_index)
+{
+	sf::Vector2f velocity{ m_throwerKobold->THROWER_MOVE_SPEED, m_throwerKobold->THROWER_MOVE_SPEED };
+	sf::Vector2f location = m_stabberKobold[t_index].getPosition();
+	
+	// reverse movement to run away player
+	if (velocity.x > m_player.getPosition().x)
+	{
+		location.x -= velocity.x;
+	}
+	else
+	{
+		location.x += velocity.x;
+	}
+
+	if (location.y > m_player.getPosition().y)
+	{
+		location.y -= velocity.y;
+	}
+	else
+	{
+		location.y += velocity.y;
+	}
+
+	if ((location.x > 0.0f && location.y > 0.0f) && (location.x < WINDOW_WIDTH - 96.0f && location.y < WINDOW_HEIGHT - 96.0f))
+	{
+		m_throwerKobold[t_index].setStatus(Status::following);
+	}
+
+	m_throwerKobold[t_index].setPosition(location);
 }
 
 /// <summary>
@@ -956,16 +969,19 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 
 	for (short index = 0; index < NUMBER_STABBERS; index++)
 	{
-		koboldHitbox = m_stabberKobold[index].getSprite().getGlobalBounds();
-
-		// hitbox modifications
-		adjustHitbox(koboldHitbox, hitBoxWidth, hitBoxHeight);
-
-		if (koboldHitbox.contains(t_position))
+		if (m_stabberKobold[index].getAlive() == true) // only hit kobolds that are alive
 		{
-			hit = true;
-			m_arrow.setTraveling(false);
-			m_stabberKobold[index].die();
+			koboldHitbox = m_stabberKobold[index].getSprite().getGlobalBounds();
+
+			// hitbox modifications
+			adjustHitbox(koboldHitbox, hitBoxWidth, hitBoxHeight);
+		
+			if (koboldHitbox.contains(t_position))
+			{
+				hit = true;
+				m_arrow.setTraveling(false);
+				m_stabberKobold[index].die();
+			}
 		}
 
 		if (index >= NUMBER_THROWERS)
@@ -974,16 +990,19 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 		}
 		else
 		{
-			koboldHitbox = m_throwerKobold[index].getSprite().getGlobalBounds();
-
-			// hitbox modifications
-			adjustHitbox(koboldHitbox, hitBoxWidth, hitBoxHeight);;
-
-			if (koboldHitbox.contains(t_position))
+			if (m_throwerKobold[index].getStatus() != Status::dead) // only hits kobolds that are alive
 			{
-				hit = true;
-				m_arrow.setTraveling(false);
-				m_throwerKobold[index].die();
+				koboldHitbox = m_throwerKobold[index].getSprite().getGlobalBounds();
+
+				// hitbox modifications
+				adjustHitbox(koboldHitbox, hitBoxWidth, hitBoxHeight);;
+
+				if (koboldHitbox.contains(t_position))
+				{
+					hit = true;
+					m_arrow.setTraveling(false);
+					m_throwerKobold[index].die();
+				}
 			}
 		}
 	}
@@ -1011,6 +1030,63 @@ bool Game::javelinHitDetecion(sf::Vector2f t_position)
 	}
 
 	return hitPlayer;
+}
+
+/// <summary>
+/// spawns new generic wave using randomized spawns 
+/// </summary>
+void Game::spawnGenericWave()
+{
+	float eastOrWest = static_cast<float>(rand() % 2);
+	float spawnY = static_cast<float>(rand() % WINDOW_HEIGHT - 96.0f);
+	sf::Vector2f spawnPoint;
+
+	if (eastOrWest == 0.0f)
+	{
+		eastOrWest = -96.0f;
+	}
+	else
+	{
+		eastOrWest = WINDOW_WIDTH;
+	}
+
+	spawnPoint = { eastOrWest, spawnY };
+}
+
+/// <summary>
+/// spawns first wave
+/// </summary>
+/// <returns></returns>
+void Game::spawnWave1()
+{
+	sf::Vector2f stabberSpawn1{ 100.0f, 20.0f };
+	sf::Vector2f stabberSpawn2{ WINDOW_WIDTH - 150.0f, 150.0f };
+	sf::Vector2f throwerSpawn{ WINDOW_WIDTH + 10.0f, 100.0f };
+
+	m_player.setPosition(WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 1.5F);
+
+	for (short index = 0; index < NUMBER_STABBERS; index++) // for now: one loop for throwers and stabbers
+	{
+		if (index % 2 == 0)
+		{
+			m_stabberKobold[index].setPosition(stabberSpawn1);
+			stabberSpawn1.y += 200.0f;
+		}
+		if (index % 2 == 1)
+		{
+			m_stabberKobold[index].setPosition(stabberSpawn2);
+			stabberSpawn2.y += 200.0f;
+		}
+		if (index > NUMBER_THROWERS - 1)
+		{
+			continue;
+		}
+		else
+		{
+			m_throwerKobold[index].setPosition(throwerSpawn);
+			throwerSpawn.y += 150.0f;
+		}
+	}
 }
 
 

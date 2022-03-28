@@ -111,7 +111,7 @@ void Thrower::throwJavelin(sf::Vector2f t_playerPosition, Javelin &t_javelin)
 	t_javelin.setVelocity(newVelocity);
 	t_javelin.setjavSpawn(m_throwerLocation);
 
-	m_following = false;
+	m_throwerState = Status::fleeing;
 }
 
 /// <summary>
@@ -119,5 +119,5 @@ void Thrower::throwJavelin(sf::Vector2f t_playerPosition, Javelin &t_javelin)
 /// </summary>
 void Thrower::die()
 {
-	m_alive = false;
+	m_throwerState = Status::dead;
 }

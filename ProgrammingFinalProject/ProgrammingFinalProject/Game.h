@@ -25,20 +25,11 @@ enum class EnemyType {
 	thrower
 };
 
-enum class BlockCheck {
-	unobstructed,
-	intersects,
-	unblockedUp,
-	unblockedRight,
-	unblockedDown,
-	unblockedLeft
-};
-
 const unsigned int WINDOW_WIDTH = 1200; // window width
 const unsigned int WINDOW_HEIGHT = 900; // window height
 const unsigned int FIGURE_SIZE = 32 * 3; // size of characters
-const unsigned short NUMBER_STABBERS = 6; // number of Stabber enemies
-const unsigned short NUMBER_THROWERS = 2; // number of throwers
+const unsigned short NUMBER_STABBERS = 8; // number of Stabber enemies
+const unsigned short NUMBER_THROWERS = 5; // number of throwers
 
 class Game
 {
@@ -85,6 +76,7 @@ private:
 	// enemy movement
 	void throwerKeepDistance(sf::Vector2f &t_velocity, sf::Vector2f &t_location, int index);
 	void throwerRunAway(sf::Vector2f& t_velocity, sf::Vector2f& t_location);
+	void throwerEnter(short t_index);
 	void enemyZigZag(sf::Vector2f& t_position, int t_arrayIndex);
 	float getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, EnemyType t_enemy);
 
@@ -100,6 +92,10 @@ private:
 	bool stabberhitDetection(sf::Sprite& t_stabberSprite);
 	bool arrowHitDetection(sf::Vector2f t_position);
 	bool javelinHitDetecion(sf::Vector2f t_position);
+
+	// spawn new waves
+	void spawnGenericWave();
+	void spawnWave1();
 
 	// non-character data members
 	sf::RenderWindow m_window; // main SFML window

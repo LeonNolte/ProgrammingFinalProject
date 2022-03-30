@@ -77,6 +77,7 @@ private:
 	void throwerKeepDistance(sf::Vector2f &t_velocity, sf::Vector2f &t_location, int index);
 	void throwerRunAway(sf::Vector2f& t_velocity, sf::Vector2f& t_location);
 	void throwerEnter(short t_index);
+	void stabberEnter(short t_index);
 	void enemyZigZag(sf::Vector2f& t_position, int t_arrayIndex);
 	float getDistanceToPlayer(sf::Vector2f& t_position, int t_arrayIndex, EnemyType t_enemy);
 
@@ -88,7 +89,6 @@ private:
 	void animateCharacter(sf::Sprite &t_sprite, Direction t_movementDirection);
 
 	// collision detection functions
-	bool playerCheckCollisions(sf::Sprite &t_charSprite);
 	bool stabberhitDetection(sf::Sprite& t_stabberSprite);
 	bool arrowHitDetection(sf::Vector2f t_position);
 	bool javelinHitDetecion(sf::Vector2f t_position);

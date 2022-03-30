@@ -12,14 +12,9 @@
 #include <iostream>
 #include "Javelin.h"
 #include <random>
+#include "Globals.h"
 
-enum class Status {
-	defaultState,
-	dead,
-	entering,
-	following,
-	fleeing
-};
+
 
 class Thrower
 {

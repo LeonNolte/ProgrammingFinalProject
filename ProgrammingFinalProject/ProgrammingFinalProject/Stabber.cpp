@@ -92,7 +92,7 @@ bool Stabber::isCountingUp()
 /// </summary>
 void Stabber::die()
 {
-	m_alive = false;
+	m_stabberState = Status::dead;
 }
 
 /// <summary>

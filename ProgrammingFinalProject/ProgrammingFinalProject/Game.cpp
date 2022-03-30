@@ -149,7 +149,7 @@ void Game::render()
 
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
-		if (m_stabberKobold[index].getAlive() == true)
+		if (m_stabberKobold[index].getStatus() != Status::dead)
 		{
 			m_window.draw(m_stabberKobold[index].getSprite());
 		}
@@ -236,51 +236,22 @@ void Game::movePlayer(Direction t_direction)
 	switch (t_direction)
 	{
 	case Direction::Up:
-		if (playerCheckCollisions(m_player.getSprite()) == false)
-		{
-			newVelocity.y = m_player.PLAYER_SPEED;
-			
-		}
-		else
-		{
-			newVelocity.y = 0.1f;
-		}
+		newVelocity.y = m_player.PLAYER_SPEED;
 		moveUp(newPosition, newVelocity);
 		animateCharacter(tempSprite, Direction::Up);
 		break;
 	case Direction::Down:
-		if (playerCheckCollisions(m_player.getSprite()) == false)
-		{
-			newVelocity.y = m_player.PLAYER_SPEED;
-		}
-		else 
-		{
-			newVelocity.y = 0.1f;
-		}
+		newVelocity.y = m_player.PLAYER_SPEED;
 		moveDown(newPosition, newVelocity);
 		animateCharacter(tempSprite, Direction::Down);
 		break;
 	case Direction::Left:
-		if (playerCheckCollisions(m_player.getSprite()) == false)
-		{
-			newVelocity.x = m_player.PLAYER_SPEED;
-		}
-		else
-		{
-			newVelocity.x = 0.1f;
-		}
+		newVelocity.x = m_player.PLAYER_SPEED;
 		moveLeft(newPosition, newVelocity);
 		animateCharacter(tempSprite, Direction::Left);
 		break;
 	case Direction::Right:
-		if (playerCheckCollisions(m_player.getSprite()) == false)
-		{
-			newVelocity.x = m_player.PLAYER_SPEED;
-		}
-		else
-		{
-			newVelocity.x = 0.1f;
-		}
+		newVelocity.x = m_player.PLAYER_SPEED;
 		moveRight(newPosition, newVelocity);
 		animateCharacter(tempSprite, Direction::Right);
 		break;
@@ -392,7 +363,7 @@ void Game::updateStabbers()
 	
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
-		if (m_stabberKobold[index].getAlive() == true) // only checks when alive
+		if (m_stabberKobold[index].getStatus() == Status::following) // only checks when alive
 		{
 			newLocation = m_stabberKobold[index].getPosition();
 			oldLocation = newLocation;
@@ -449,6 +420,10 @@ void Game::updateStabbers()
 				m_stabberKobold[index].setPosition(newLocation);
 			}
 		}
+		else if (m_stabberKobold[index].getStatus() == Status::entering)
+		{
+			stabberEnter(index);
+		}
 	}
 }
 
@@ -466,7 +441,6 @@ void Game::updateThrowers()
 		if (m_throwerKobold[index].getStatus() != Status::dead) // only updates if Kobold is alive
 		{
 			newLocation = m_throwerKobold[index].getPosition();
-
 			if (m_throwerKobold[index].getStatus() == Status::following) // follows player when true
 			{
 				// for following
@@ -501,23 +475,21 @@ void Game::updateThrowers()
 						}
 					}
 				}
+
+				// adjusts position of Kobold to keep distance/run away
+				m_throwerKobold[index].setPosition(newLocation);
 			}
-			else if (m_throwerKobold[index].getStatus() == Status::fleeing) // runs away when javelin is thrown (following == false)
+			else if (m_throwerKobold[index].getStatus() == Status::fleeing) // runs away when javelin is thrown
 			{
-				if (m_throwerKobold[index].getStatus() != Status::dead && checkDespawnThrower(newLocation) == false) // 
-				{
-					newVelocity = { 0.8f, 0.8f };
-					throwerRunAway(newVelocity, newLocation);
-				}
+				newVelocity = { 0.8f, 0.8f };
+				throwerRunAway(newVelocity, newLocation);
+				m_throwerKobold[index].setPosition(newLocation);
 			}
 			else if (m_throwerKobold[index].getStatus() == Status::entering)
 			{
 				throwerEnter(index);
 			}
 		}
-		
-		// adjusts position of Kobold to keep distance/run away
-		m_throwerKobold[index].setPosition(newLocation);
 		
 		// check if Javelin hit player after being thrown
 		if (m_javelins[index].getTraveling() == true)
@@ -590,18 +562,18 @@ void Game::throwerRunAway(sf::Vector2f& t_velocity, sf::Vector2f& t_location)
 	}
 }
 
+
 /// <summary>
 /// makes thrower enter the playing field
 /// </summary>
-/// <param name="t_velocity"> </param>
-/// <param name="t_location"></param>
+/// <param name="t_index"> index of thrower </param>
 void Game::throwerEnter(short t_index)
 {
 	sf::Vector2f velocity{ m_throwerKobold->THROWER_MOVE_SPEED, m_throwerKobold->THROWER_MOVE_SPEED };
-	sf::Vector2f location = m_stabberKobold[t_index].getPosition();
+	sf::Vector2f location = m_throwerKobold[t_index].getPosition();
 	
-	// reverse movement to run away player
-	if (velocity.x > m_player.getPosition().x)
+	// runs towards player from beyond the screen
+	if (location.x > m_player.getPosition().x)
 	{
 		location.x -= velocity.x;
 	}
@@ -628,6 +600,42 @@ void Game::throwerEnter(short t_index)
 }
 
 /// <summary>
+/// stabber
+/// </summary>
+/// <param name="t_index"></param>
+void Game::stabberEnter(short t_index)
+{
+	sf::Vector2f velocity{ m_stabberKobold->STABBER_SPEED, m_stabberKobold->STABBER_SPEED };
+	sf::Vector2f location = m_stabberKobold[t_index].getPosition();
+
+	// runs towards player from beyond the screen
+	if (location.x > m_player.getPosition().x)
+	{
+		location.x -= velocity.x;
+	}
+	else
+	{
+		location.x += velocity.x;
+	}
+
+	if (location.y > m_player.getPosition().y)
+	{
+		location.y -= velocity.y;
+	}
+	else
+	{
+		location.y += velocity.y;
+	}
+
+	if ((location.x > 0.0f && location.y > 0.0f) && (location.x < WINDOW_WIDTH - 96.0f && location.y < WINDOW_HEIGHT - 96.0f))
+	{
+		m_stabberKobold[t_index].setStatus(Status::following);
+	}
+
+	m_stabberKobold[t_index].setPosition(location);
+}
+
+/// <summary>
 /// checks if thrower gets out of bounds and despawns
 /// </summary>
 bool Game::checkDespawnThrower(sf::Vector2f t_location)
@@ -651,13 +659,13 @@ bool Game::checkDespawnThrower(sf::Vector2f t_location)
 /// <param name="t_height"> t_height of new hitbox </param>
 void Game::adjustHitbox(sf::FloatRect &t_hitbox, float t_width, float t_height)
 {
-	float newLeft = 96.0f - t_width / 2;
-	float newTop = 96.0f - t_height / 2;
+	float newLeft = (96.0f - t_width) / 2.0f;
+	float newTop = (96.0f - t_height) / 2.0f;
 
-	t_hitbox.left += 32.0f;
+	t_hitbox.left += newLeft;
 	t_hitbox.width = t_width;
 	t_hitbox.height = t_height;
-	t_hitbox.top += 32.0f;
+	t_hitbox.top += newTop;
 }
 
 /// <summary>
@@ -847,88 +855,6 @@ void Game::updateJavelin(Javelin& t_javelin)
 	}
 }
 
-
-
-/// <summary>
-/// checks for collisions with other sprites north
-/// </summary>
-/// <param name="t_charSprite"> sprite being checked </param>
-/// <returns> true if it collides, false if it doesn't </returns>
-bool Game::playerCheckCollisions(sf::Sprite &t_charSprite)
-{
-	bool intersects = false;
-	sf::FloatRect characterHitbox = t_charSprite.getGlobalBounds();
-	sf::FloatRect koboldHitbox;
-	sf::Vector2f newPosition; // to set location to knock back Kobolds on Impact
-
-	// adjusted hit boxes
-	float hitBoxWidth = 32.0f;
-	float hitBoxHeight = 64.0f;
-
-	adjustHitbox(characterHitbox, hitBoxWidth, hitBoxHeight);	
-
-	for (short index = 0; index < NUMBER_STABBERS; index++)
-	{
-		koboldHitbox = m_stabberKobold[index].getSprite().getGlobalBounds();
-
-		// adjustment for kobolds
-		adjustHitbox(koboldHitbox, hitBoxWidth, hitBoxHeight);
-
-		if (koboldHitbox.top == characterHitbox.top && koboldHitbox.left == characterHitbox.left) // no check if coordinates are identical
-		{
-			continue;
-		}
-
-		if (koboldHitbox.intersects(characterHitbox))
-		{
-			intersects = true;
-			if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
-			{
-				newPosition = m_stabberKobold[index].getSprite().getPosition();
-				newPosition.y += 10.0f;
-				m_stabberKobold[index].setPosition(newPosition);
-			}
-			else // shoves Kobolds downwards
-			{
-				newPosition = m_stabberKobold[index].getSprite().getPosition();
-				newPosition.y -= 10.0f;
-				m_stabberKobold[index].setPosition(newPosition);
-			}
-		}
-
-		if (index >= NUMBER_THROWERS) // checks if index exceedes number of throwers
-		{
-			continue;
-		}
-		else // only checks if index is within thrower array size
-		{
-			koboldHitbox = m_throwerKobold[index].getSprite().getGlobalBounds();
-
-			// adjustment for kobolds
-			adjustHitbox(koboldHitbox, hitBoxWidth, hitBoxHeight);
-
-			if (koboldHitbox.intersects(characterHitbox))
-			{
-				intersects = true;
-				if (koboldHitbox.top - characterHitbox.top > hitBoxHeight / 2.0f) // shoves Kobolds upwards
-				{
-					newPosition = m_throwerKobold[index].getSprite().getPosition();
-					newPosition.y += 10.0f;
-					m_throwerKobold[index].setPosition(newPosition);
-				}
-				else // shoves Kobolds downwards
-				{
-					newPosition = m_throwerKobold[index].getSprite().getPosition();
-					newPosition.y -= 10.0f;
-					m_throwerKobold[index].setPosition(newPosition);
-				}
-			}
-		}
-	}
-
-	return intersects;
-}
-
 /// <summary>
 /// checks if stabber intersects with player
 /// </summary>
@@ -969,7 +895,7 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 
 	for (short index = 0; index < NUMBER_STABBERS; index++)
 	{
-		if (m_stabberKobold[index].getAlive() == true) // only hit kobolds that are alive
+		if (m_stabberKobold[index].getStatus() != Status::dead) // only hit kobolds that are alive
 		{
 			koboldHitbox = m_stabberKobold[index].getSprite().getGlobalBounds();
 
@@ -1059,9 +985,9 @@ void Game::spawnGenericWave()
 /// <returns></returns>
 void Game::spawnWave1()
 {
-	sf::Vector2f stabberSpawn1{ 100.0f, 20.0f };
-	sf::Vector2f stabberSpawn2{ WINDOW_WIDTH - 150.0f, 150.0f };
-	sf::Vector2f throwerSpawn{ WINDOW_WIDTH + 10.0f, 100.0f };
+	sf::Vector2f stabberSpawn1{ -100.0f, 20.0f };
+	sf::Vector2f stabberSpawn2{ WINDOW_WIDTH - 10.0f, 150.0f };
+	sf::Vector2f throwerSpawn{ WINDOW_WIDTH - 10.0f, 100.0f };
 
 	m_player.setPosition(WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 1.5F);
 
@@ -1088,5 +1014,3 @@ void Game::spawnWave1()
 		}
 	}
 }
-
-

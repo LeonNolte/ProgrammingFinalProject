@@ -12,6 +12,7 @@
 #include <iostream>
 #include <random>
 #include <time.h>
+#include "Globals.h"
 
 class Stabber
 {
@@ -24,8 +25,7 @@ public:
 	sf::Vector2f getPosition();
 	float getSpeed();
 	int getZigZagCounter();
-	// Status getStatus() { return m_stabberState; }; // gets state of thrower
-	bool getAlive() { return m_alive; };
+	Status getStatus() { return m_stabberState; }; // gets state of thrower
 
 	bool isCountingUp();
 	void die();
@@ -33,7 +33,7 @@ public:
 	// set functions
 	void setPosition(sf::Vector2f t_newPosition);
 	void setPosition(float t_x, float t_y);
-	void setAlive(bool t_alive) { m_alive = t_alive; };
+	void setStatus(Status t_newState) { m_stabberState = t_newState; }; // assigns new state to stabber
 
 	const float STABBER_SPEED = 1.8f;
 	const short DAMAGE = 10;
@@ -47,9 +47,7 @@ private:
 	int m_zigZagCounter; // counts up and down to produce zig zag movement
 	bool m_countingUp = true; // for zig zag counter, true when counting up (move left while approaching player)
 
-	// Status m_stabberState = Status::dead; // status variable of stabber
-	bool m_alive = true;
-	bool m_spawned = false; // true if kobold is in bound
+	Status m_stabberState = Status::entering; // status of Stabber enemy
 
 };
 

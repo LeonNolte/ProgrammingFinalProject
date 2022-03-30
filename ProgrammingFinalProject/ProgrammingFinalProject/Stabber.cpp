@@ -14,7 +14,7 @@ Stabber::Stabber()
 
 	m_stabberLocation = { 10.0f, 10.0f };
 	
-	if (!m_stabberTexture.loadFromFile("ASSETS\\IMAGES\\Stabber.png"))
+	if (!m_stabberTexture.loadFromFile("ASSETS\\IMAGES\\StabberAnimationSheet.png"))
 	{
 		std::cout << "problem loading stabber texture" << std::endl;
 	}

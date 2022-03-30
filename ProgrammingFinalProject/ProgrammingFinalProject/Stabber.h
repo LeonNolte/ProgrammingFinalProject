@@ -34,6 +34,7 @@ public:
 	void setPosition(sf::Vector2f t_newPosition);
 	void setPosition(float t_x, float t_y);
 	void setStatus(Status t_newState) { m_stabberState = t_newState; }; // assigns new state to stabber
+	void setSprite(sf::Sprite t_newSprite) { m_stabberSprite = t_newSprite; }; // sets new sprite
 
 	const float STABBER_SPEED = 1.8f;
 	const short DAMAGE = 10;

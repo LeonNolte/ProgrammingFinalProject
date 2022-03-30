@@ -360,36 +360,43 @@ void Game::updateStabbers()
 	sf::Vector2f newVelocity; // new velocity of Kobold
 	sf::Vector2f newLocation; // sets new location of stabber
 	sf::Vector2f oldLocation; // to reset location for bound check
+	sf::Sprite tempSprite; // temporary sprite for animation
 	
 	for (int index = 0; index < NUMBER_STABBERS; index++)
 	{
+		tempSprite = m_stabberKobold[index].getSprite();
+
 		if (m_stabberKobold[index].getStatus() == Status::following) // only checks when alive
 		{
 			newLocation = m_stabberKobold[index].getPosition();
 			oldLocation = newLocation;
 
 			// for following
-			if (m_player.getPosition().x > m_stabberKobold[index].getPosition().x)
-			{
-				newVelocity.x = m_stabberKobold[index].getSpeed();
-				moveRight(newLocation, newVelocity);
-			}
-			if (m_player.getPosition().x < m_stabberKobold[index].getPosition().x)
-			{
-				newVelocity.x = m_stabberKobold[index].getSpeed();
-				moveLeft(newLocation, newVelocity);
-			}
 			if (m_player.getPosition().y > m_stabberKobold[index].getPosition().y)
 			{
 				newVelocity.y = m_stabberKobold[index].getSpeed();
 				moveDown(newLocation, newVelocity);
+				animateCharacter(tempSprite, Direction::Down);
 			}
 			if (m_player.getPosition().y < m_stabberKobold[index].getPosition().y)
 			{
 				newVelocity.y = m_stabberKobold[index].getSpeed();
 				moveUp(newLocation, newVelocity);
+				animateCharacter(tempSprite, Direction::Up);
 			}
-
+			if (m_player.getPosition().x > m_stabberKobold[index].getPosition().x)
+			{
+				newVelocity.x = m_stabberKobold[index].getSpeed();
+				moveRight(newLocation, newVelocity);
+				animateCharacter(tempSprite, Direction::Right);
+			}
+			if (m_player.getPosition().x < m_stabberKobold[index].getPosition().x)
+			{
+				newVelocity.x = m_stabberKobold[index].getSpeed();
+				moveLeft(newLocation, newVelocity);
+				animateCharacter(tempSprite, Direction::Left);
+			}
+	
 			// call zig-zag function
 			enemyZigZag(newLocation, index);
 
@@ -424,6 +431,10 @@ void Game::updateStabbers()
 		{
 			stabberEnter(index);
 		}
+
+		newLocation = m_stabberKobold[index].getPosition();
+		m_stabberKobold[index].setSprite(tempSprite);
+		m_stabberKobold[index].setPosition(newLocation);
 	}
 }
 

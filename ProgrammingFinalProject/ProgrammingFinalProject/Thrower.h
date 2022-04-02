@@ -33,6 +33,7 @@ public:
 	// set functions
 	void setPosition(sf::Vector2f t_newPosition);
 	void setStatus(Status t_newStatus) { m_throwerState = t_newStatus; }; // assigns new status to thrower
+	void setSprite(sf::Sprite t_newSprite) { m_throwerSprite = t_newSprite; }; // sets new sprite
 
 	bool checkInRange(sf::Vector2f t_playerPosition);
 	void throwJavelin(sf::Vector2f t_playerPosition, Javelin& t_javelin);

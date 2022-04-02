@@ -81,7 +81,6 @@ void Game::processEvents()
 	}
 }
 
-
 /// <summary>
 /// deal with key presses from the user
 /// </summary>
@@ -349,7 +348,6 @@ void Game::updatePlayer()
 	}
 
 	m_health.setString(std::to_string(m_player.getHealth()));
-
 }
 
 /// <summary>
@@ -376,13 +374,11 @@ void Game::updateStabbers()
 			{
 				newVelocity.y = m_stabberKobold[index].getSpeed();
 				moveDown(newLocation, newVelocity);
-				animateCharacter(tempSprite, Direction::Down);
 			}
 			if (m_player.getPosition().y < m_stabberKobold[index].getPosition().y)
 			{
 				newVelocity.y = m_stabberKobold[index].getSpeed();
 				moveUp(newLocation, newVelocity);
-				animateCharacter(tempSprite, Direction::Up);
 			}
 			if (m_player.getPosition().x > m_stabberKobold[index].getPosition().x)
 			{
@@ -446,23 +442,18 @@ void Game::updateThrowers()
 {
 	sf::Vector2f newVelocity = { m_throwerKobold[0].getSpeed(), m_throwerKobold[0].getSpeed() }; // new velocity of thrower Kobold
 	sf::Vector2f newLocation; // sets new location of thrower Kobold
+	sf::Sprite newSprite; // new animation sprite
 	
 	for (int index = 0; index < NUMBER_THROWERS; index++)
 	{
+		newSprite = m_throwerKobold[index].getSprite();
+
 		if (m_throwerKobold[index].getStatus() != Status::dead) // only updates if Kobold is alive
 		{
 			newLocation = m_throwerKobold[index].getPosition();
 			if (m_throwerKobold[index].getStatus() == Status::following) // follows player when true
 			{
 				// for following
-				if (m_player.getPosition().x > m_throwerKobold[index].getPosition().x)
-				{
-					moveRight(newLocation, newVelocity);
-				}
-				if (m_player.getPosition().x < m_throwerKobold[index].getPosition().x)
-				{
-					moveLeft(newLocation, newVelocity);
-				}
 				if (m_player.getPosition().y > m_throwerKobold[index].getPosition().y)
 				{
 					moveDown(newLocation, newVelocity);
@@ -471,7 +462,19 @@ void Game::updateThrowers()
 				{
 					moveUp(newLocation, newVelocity);
 				}
-
+				if (m_player.getPosition().x > m_throwerKobold[index].getPosition().x)
+				{
+					animateCharacter(newSprite, Direction::Right);
+					m_throwerKobold[index].setSprite(newSprite);
+					moveRight(newLocation, newVelocity);
+				}
+				if (m_player.getPosition().x < m_throwerKobold[index].getPosition().x)
+				{
+					animateCharacter(newSprite, Direction::Left);
+					m_throwerKobold[index].setSprite(newSprite);
+					moveLeft(newLocation, newVelocity);
+				}
+			
 				// keeps distance from player
 				throwerKeepDistance(newVelocity, newLocation, index);
 

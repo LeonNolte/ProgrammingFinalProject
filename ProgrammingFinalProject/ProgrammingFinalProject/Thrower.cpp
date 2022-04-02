@@ -10,7 +10,7 @@
 
 Thrower::Thrower()
 {
-	if (!m_throwerTexture.loadFromFile("ASSETS\\IMAGES\\Thrower.png"))
+	if (!m_throwerTexture.loadFromFile("ASSETS\\IMAGES\\ThrowerAnimationSheet.png"))
 	{
 		std::cout << "problem loading thrower texture" << std::endl;
 	}

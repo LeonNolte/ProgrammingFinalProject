@@ -96,6 +96,14 @@ void Game::processKeys(sf::Event t_event)
 		if (sf::Keyboard::R == t_event.key.code)
 		{
 			resetGame();
+
+			// reset player health (workaraound solution)
+			m_health.setString("Health: " + std::to_string(m_player.getHealth()));
+			m_health.setPosition(40.0f, 40.0f);
+
+			// reset score (workaraound solution)
+			m_scoreText.setString("Score: ");
+			m_scoreText.setPosition(40.0f, 100.0f);
 		}
 	}
 }
@@ -744,6 +752,12 @@ void Game::adjustHitbox(sf::FloatRect &t_hitbox, float t_width, float t_height)
 void Game::endGame()
 {
 	m_mode = GameState::endScreen;
+
+	// workaround for the stats not displaying properly 
+	m_scoreText.setPosition(100.0f, 300.0f);
+	m_scoreText.setString("Your final score: " + std::to_string(m_score) + ", Stabbers killed: " + std::to_string(m_killedStabbers) + ", Throwers killed: " + std::to_string(m_killedThrowers));
+	m_health.setPosition(100.0f, 500.0f);
+	m_health.setString("You survived " + std::to_string(m_timeCounter / 60) + " seconds. Press R to restart");
 }
 
 /// <summary>

@@ -135,6 +135,8 @@ void Game::update(sf::Time t_deltaTime)
 	{
 		updateArrow();
 	}
+
+	m_timeCounter++; // incerements time counter
 }
 
 /// <summary>
@@ -146,14 +148,14 @@ void Game::render()
 	m_window.draw(m_backgroundSprite);
 	m_window.draw(m_player.getSprite());
 
-	for (int index = 0; index < NUMBER_STABBERS; index++)
+	for (int index = 0; index < MAX_STABBERS; index++)
 	{
 		if (m_stabberKobold[index].getStatus() != Status::dead)
 		{
 			m_window.draw(m_stabberKobold[index].getSprite());
 		}
 		
-		if (index > NUMBER_THROWERS - 1)
+		if (index > MAX_THROWERS - 1)
 		{
 			continue;
 		}
@@ -176,6 +178,7 @@ void Game::render()
 	}
 
 	m_window.draw(m_health);
+	m_window.draw(m_scoreText);
 	m_window.display();
 	
 }
@@ -190,12 +193,20 @@ void Game::setupFontAndText()
 		std::cout << "problem loading arial black font" << std::endl;
 	}
 	m_health.setFont(m_ArialBlackfont);
-	m_health.setString(std::to_string(m_player.getHealth()));
+	m_health.setString("Health: " + std::to_string(m_player.getHealth()));
 	m_health.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
 	m_health.setPosition(40.0f, 40.0f);
 	m_health.setCharacterSize(30U);
 	m_health.setFillColor(sf::Color::Black);
 	m_health.setOutlineColor(sf::Color::White);
+
+	m_scoreText.setFont(m_ArialBlackfont);
+	m_scoreText.setString("Score: ");
+	m_scoreText.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
+	m_scoreText.setPosition(40.0f, 100.0f);
+	m_scoreText.setCharacterSize(30U);
+	m_scoreText.setFillColor(sf::Color::Black);
+	m_scoreText.setOutlineColor(sf::Color::White);
 }
 
 /// <summary>
@@ -218,7 +229,7 @@ void Game::setupSprite()
 /// </summary>
 void Game::setupObjects()
 {
-	spawnWave1();
+	SpawnNewWave();
 }
 
 /// <summary>
@@ -347,7 +358,8 @@ void Game::updatePlayer()
 		movePlayer(Direction::Right);
 	}
 
-	m_health.setString(std::to_string(m_player.getHealth()));
+	m_health.setString("Health: " + std::to_string(m_player.getHealth()));
+	m_scoreText.setString("Score: " + std::to_string(m_score));
 }
 
 /// <summary>
@@ -360,7 +372,7 @@ void Game::updateStabbers()
 	sf::Vector2f oldLocation; // to reset location for bound check
 	sf::Sprite tempSprite; // temporary sprite for animation
 	
-	for (int index = 0; index < NUMBER_STABBERS; index++)
+	for (int index = 0; index < MAX_STABBERS; index++)
 	{
 		tempSprite = m_stabberKobold[index].getSprite();
 
@@ -444,7 +456,7 @@ void Game::updateThrowers()
 	sf::Vector2f newLocation; // sets new location of thrower Kobold
 	sf::Sprite newSprite; // new animation sprite
 	
-	for (int index = 0; index < NUMBER_THROWERS; index++)
+	for (int index = 0; index < MAX_THROWERS; index++)
 	{
 		newSprite = m_throwerKobold[index].getSprite();
 
@@ -690,12 +702,17 @@ void Game::updateEnemies()
 	updateStabbers();
 	updateThrowers();
 
-	for (int index = 0; index < NUMBER_THROWERS; index++) // updates thrown javelins
+	for (int index = 0; index < MAX_THROWERS; index++) // updates thrown javelins
 	{
 		if (m_javelins[index].getTraveling() == true)
 		{
 			m_javelins[index].travel();
 		}
+	}
+
+	if (m_timeCounter % 600 == 0)
+	{
+		SpawnNewWave();
 	}
 }
 
@@ -907,7 +924,7 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 	float hitBoxWidth = 48.0f;
 	float hitBoxHeight = 88.0f;
 
-	for (short index = 0; index < NUMBER_STABBERS; index++)
+	for (short index = 0; index < MAX_STABBERS; index++)
 	{
 		if (m_stabberKobold[index].getStatus() != Status::dead) // only hit kobolds that are alive
 		{
@@ -921,10 +938,11 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 				hit = true;
 				m_arrow.setTraveling(false);
 				m_stabberKobold[index].die();
+				m_score += SCORE_PER_STABBER;
 			}
 		}
 
-		if (index >= NUMBER_THROWERS)
+		if (index >= MAX_THROWERS)
 		{
 			continue;
 		}
@@ -942,6 +960,7 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 					hit = true;
 					m_arrow.setTraveling(false);
 					m_throwerKobold[index].die();
+					m_score += SCORE_PER_THROWER;
 				}
 			}
 		}
@@ -972,25 +991,41 @@ bool Game::javelinHitDetecion(sf::Vector2f t_position)
 	return hitPlayer;
 }
 
+
+
 /// <summary>
-/// spawns new generic wave using randomized spawns 
+/// spawns new randomly generated wave of enemies
 /// </summary>
-void Game::spawnGenericWave()
+void Game::SpawnNewWave()
 {
-	float eastOrWest = static_cast<float>(rand() % 2);
-	float spawnY = static_cast<float>(rand() % WINDOW_HEIGHT - 96.0f);
-	sf::Vector2f spawnPoint;
-
-	if (eastOrWest == 0.0f)
+	for (short index = 0; index < m_numberStabbers; index++) // for now: one loop for throwers and stabbers
 	{
-		eastOrWest = -96.0f;
-	}
-	else
-	{
-		eastOrWest = WINDOW_WIDTH;
+		if (m_stabberKobold[index].getStatus() == Status::dead)
+		{
+			m_stabberKobold[index].spawnRandom();
+		}
+
+		if (index > m_numberThrowers - 1)
+		{
+			continue;
+		}
+
+		if (m_throwerKobold[index].getStatus() == Status::dead)
+		{
+			m_throwerKobold[index].spawnRandom();
+		}
 	}
 
-	spawnPoint = { eastOrWest, spawnY };
+	if (m_numberStabbers <= MAX_STABBERS - 2)
+	{
+		m_numberStabbers += 2;
+	}
+	if (m_numberThrowers <= MAX_THROWERS - 2)
+	{
+		m_numberThrowers += 2;
+	}
+
+	m_waveCounter++;
 }
 
 /// <summary>
@@ -1005,8 +1040,10 @@ void Game::spawnWave1()
 
 	m_player.setPosition(WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 1.5F);
 
-	for (short index = 0; index < NUMBER_STABBERS; index++) // for now: one loop for throwers and stabbers
+	for (short index = 0; index < m_numberStabbers; index++) // for now: one loop for throwers and stabbers
 	{
+		m_stabberKobold[index].setStatus(Status::entering);
+
 		if (index % 2 == 0)
 		{
 			m_stabberKobold[index].setPosition(stabberSpawn1);
@@ -1017,14 +1054,17 @@ void Game::spawnWave1()
 			m_stabberKobold[index].setPosition(stabberSpawn2);
 			stabberSpawn2.y += 200.0f;
 		}
-		if (index > NUMBER_THROWERS - 1)
+		if (index > m_numberThrowers - 1)
 		{
 			continue;
 		}
 		else
 		{
+			m_throwerKobold[index].setStatus(Status::entering);
 			m_throwerKobold[index].setPosition(throwerSpawn);
 			throwerSpawn.y += 150.0f;
 		}
 	}
+
+	m_waveCounter++;
 }

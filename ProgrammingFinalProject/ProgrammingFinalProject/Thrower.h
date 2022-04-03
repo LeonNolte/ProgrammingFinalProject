@@ -29,6 +29,7 @@ public:
 	Status getStatus() { return m_throwerState; }; // gets state of thrower
 
 	short incrementWaitCounter();
+	void spawnRandom();
 
 	// set functions
 	void setPosition(sf::Vector2f t_newPosition);
@@ -48,7 +49,7 @@ private:
 	sf::Sprite m_throwerSprite; // sprite of Thrower Kobold
 	sf::Texture m_throwerTexture; // texture of Thrower Kobold
 
-	Status m_throwerState = Status::entering; // status of thrower kobold
+	Status m_throwerState = Status::dead; // status of thrower kobold
 
 	short m_waitCounter = 0; // makes throwers wait when in range
 

@@ -25,11 +25,12 @@ enum class EnemyType {
 	thrower
 };
 
-const unsigned int WINDOW_WIDTH = 1200; // window width
-const unsigned int WINDOW_HEIGHT = 900; // window height
+
 const unsigned int FIGURE_SIZE = 32 * 3; // size of characters
-const unsigned short NUMBER_STABBERS = 8; // number of Stabber enemies
-const unsigned short NUMBER_THROWERS = 5; // number of throwers
+const unsigned short MAX_STABBERS = 23; // max number of Stabber enemies
+const unsigned short MAX_THROWERS = 20; // max number of throwers
+const unsigned short SCORE_PER_STABBER = 25;
+const unsigned short SCORE_PER_THROWER = 100;
 
 class Game
 {
@@ -94,26 +95,33 @@ private:
 	bool javelinHitDetecion(sf::Vector2f t_position);
 
 	// spawn new waves
-	void spawnGenericWave();
+	void SpawnNewWave();
 	void spawnWave1();
 
 	// non-character data members
 	sf::RenderWindow m_window; // main SFML window
 	sf::Font m_ArialBlackfont; // font used by message
 	sf::Text m_health; // text used for message on screen
+	sf::Text m_scoreText; // score used for performance
 	sf::Texture m_backgroundTexture; // texture used for sfml logo
 	sf::Sprite m_backgroundSprite; // sprite used for background
 	bool m_exitGame; // control exiting game
 
+	short m_waveCounter = 0;
+	int m_timeCounter = 1;
+	int m_score = 0;
+	unsigned short m_numberStabbers = 8; // number of Stabbers in game (for for loops)
+	unsigned short m_numberThrowers = 5; // number of Throwers in game
+
 	// object related data members
-	EnemyType enemy = EnemyType::stabber; // basic enemy type enum
+	EnemyType m_enemy = EnemyType::stabber; // basic enemy type enum
 	int m_animationCounter = 0; // counter to manage animation
 
 	// objects
 	Player m_player; // Player object
-	Stabber m_stabberKobold[NUMBER_STABBERS]; // array of Stabber Kobolds
-	Thrower m_throwerKobold[NUMBER_THROWERS]; // array of thrower Kobolds
-	Javelin m_javelins[NUMBER_THROWERS]; // array of Javelins for throwers
+	Stabber m_stabberKobold[MAX_STABBERS]; // array of Stabber Kobolds
+	Thrower m_throwerKobold[MAX_THROWERS]; // array of thrower Kobolds
+	Javelin m_javelins[MAX_THROWERS]; // array of Javelins for throwers
 	Arrow m_arrow; // arrow object
 	
 };

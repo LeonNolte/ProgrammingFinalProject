@@ -28,6 +28,7 @@ public:
 	Status getStatus() { return m_stabberState; }; // gets state of thrower
 
 	bool isCountingUp();
+	void spawnRandom();
 	void die();
 
 	// set functions
@@ -48,7 +49,7 @@ private:
 	int m_zigZagCounter; // counts up and down to produce zig zag movement
 	bool m_countingUp = true; // for zig zag counter, true when counting up (move left while approaching player)
 
-	Status m_stabberState = Status::entering; // status of Stabber enemy
+	Status m_stabberState = Status::dead; // status of Stabber enemy
 
 };
 

@@ -59,6 +59,30 @@ short Thrower::incrementWaitCounter()
 }
 
 /// <summary>
+/// spawns a new thrower in random location
+/// </summary>
+void Thrower::spawnRandom()
+{
+	float eastOrWest = static_cast<float>(rand() % 2); // decides on which side Kobold spawns
+	float spawnY = static_cast<float>(rand() % WINDOW_HEIGHT - 96.0f); // y value of spawn
+	sf::Vector2f spawnPoint;
+
+	if (eastOrWest == 0.0f)
+	{
+		eastOrWest = -96.0f;
+	}
+	else
+	{
+		eastOrWest = WINDOW_WIDTH;
+	}
+
+	spawnPoint = { eastOrWest, spawnY };
+
+	setPosition(spawnPoint);
+	setStatus(Status::entering);
+}
+
+/// <summary>
 /// sets position of Stabber Kobold
 /// </summary>
 void Thrower::setPosition(sf::Vector2f t_newPosition)

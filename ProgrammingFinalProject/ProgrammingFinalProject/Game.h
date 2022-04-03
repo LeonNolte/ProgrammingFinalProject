@@ -19,6 +19,7 @@
 #include "MyVector2.h" // taken from Maths Lab Project "My Vector2f"
 #include <iostream> // for testing and error message display
 #include <string> // for string functions (score display)
+#include "EndGameScreen.h"
 
 enum class EnemyType {
 	stabber,
@@ -27,7 +28,7 @@ enum class EnemyType {
 
 
 const unsigned int FIGURE_SIZE = 32 * 3; // size of characters
-const unsigned short MAX_STABBERS = 23; // max number of Stabber enemies
+const unsigned short MAX_STABBERS = 22; // max number of Stabber enemies
 const unsigned short MAX_THROWERS = 20; // max number of throwers
 const unsigned short SCORE_PER_STABBER = 25;
 const unsigned short SCORE_PER_THROWER = 100;
@@ -85,6 +86,8 @@ private:
 	// misc functions
 	bool checkDespawnThrower(sf::Vector2f t_location);
 	void adjustHitbox(sf::FloatRect &t_hitbox, float t_width, float t_height);
+	void endGame();
+	void resetGame();
 
 	// animation functions
 	void animateCharacter(sf::Sprite &t_sprite, Direction t_movementDirection);
@@ -110,8 +113,13 @@ private:
 	short m_waveCounter = 0;
 	int m_timeCounter = 1;
 	int m_score = 0;
-	unsigned short m_numberStabbers = 8; // number of Stabbers in game (for for loops)
+	GameState m_mode = GameState::gameScreen;
+
+	unsigned short m_numberStabbers = 7; // number of Stabbers in game (for for loops)
 	unsigned short m_numberThrowers = 5; // number of Throwers in game
+
+	short m_killedStabbers = 0; // number of stabbers killed
+	short m_killedThrowers = 0; // number of throwers killed 
 
 	// object related data members
 	EnemyType m_enemy = EnemyType::stabber; // basic enemy type enum
@@ -123,6 +131,7 @@ private:
 	Thrower m_throwerKobold[MAX_THROWERS]; // array of thrower Kobolds
 	Javelin m_javelins[MAX_THROWERS]; // array of Javelins for throwers
 	Arrow m_arrow; // arrow object
+	EndGameScreen m_endScreen; // end of game screen as object
 	
 };
 

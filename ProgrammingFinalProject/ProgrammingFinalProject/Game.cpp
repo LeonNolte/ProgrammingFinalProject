@@ -91,6 +91,13 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
+	if (m_mode == GameState::endScreen)
+	{
+		if (sf::Keyboard::R == t_event.key.code)
+		{
+			resetGame();
+		}
+	}
 }
 
 /// <summary>
@@ -125,18 +132,27 @@ void Game::update(sf::Time t_deltaTime)
 		m_window.close();
 	}
 
-	updatePlayer();
-
-	m_animationCounter++;
-
-	updateEnemies();
-
-	if (m_arrow.getTraveling() == true)
+	if (m_mode == GameState::gameScreen)
 	{
-		updateArrow();
-	}
+		updatePlayer();
 
-	m_timeCounter++; // incerements time counter
+		m_animationCounter++;
+
+		updateEnemies();
+
+		if (m_arrow.getTraveling() == true)
+		{
+			updateArrow();
+		}
+
+		m_timeCounter++; // incerements time counter
+	}	
+	else
+	{
+		m_endScreen.displayScore(m_score);
+		m_endScreen.displayStats(m_killedStabbers, m_killedThrowers);
+		m_endScreen.displaySurvivalTime(m_timeCounter / 60.0f);
+	}
 }
 
 /// <summary>
@@ -146,39 +162,57 @@ void Game::render()
 {
 	m_window.clear(sf::Color::White);
 	m_window.draw(m_backgroundSprite);
-	m_window.draw(m_player.getSprite());
 
-	for (int index = 0; index < MAX_STABBERS; index++)
+	if (m_mode == GameState::gameScreen) // render for game screen
 	{
-		if (m_stabberKobold[index].getStatus() != Status::dead)
+
+		m_window.draw(m_player.getSprite());
+
+		// drawing enemies
+		for (int index = 0; index < MAX_STABBERS; index++)
 		{
-			m_window.draw(m_stabberKobold[index].getSprite());
-		}
-		
-		if (index > MAX_THROWERS - 1)
-		{
-			continue;
-		}
-		else
-		{
-			if (m_throwerKobold[index].getStatus() != Status::dead)
+			if (m_stabberKobold[index].getStatus() != Status::dead) // only if alive
 			{
-				m_window.draw(m_throwerKobold[index].getSprite());
+				m_window.draw(m_stabberKobold[index].getSprite());
 			}
-			if (m_javelins[index].getTraveling() == true)
+
+			if (index > MAX_THROWERS - 1)
 			{
-				m_window.draw(m_javelins[index].getSprite());
-			}			
+				continue;
+			}
+			else
+			{
+				if (m_throwerKobold[index].getStatus() != Status::dead) // only if alive
+				{
+					m_window.draw(m_throwerKobold[index].getSprite());
+				}
+				if (m_javelins[index].getTraveling() == true) // only when traveling
+				{
+					m_window.draw(m_javelins[index].getSprite());
+				}
+			}
 		}
+
+		if (m_arrow.getTraveling() == true) // only when traveling
+		{
+			m_window.draw(m_arrow.getSprite());
+		}
+
+		m_window.draw(m_health);
+		m_window.draw(m_scoreText);
 	}
 
-	if (m_arrow.getTraveling() == true)
+	else // render end screen
 	{
-		m_window.draw(m_arrow.getSprite());
+		m_window.draw(m_health);
+		m_window.draw(m_scoreText);
+
+		m_window.draw(m_endScreen.getKilledStabbers());
+		m_window.draw(m_endScreen.getKilledThrowers());
+		m_window.draw(m_endScreen.getScore());
+		m_window.draw(m_endScreen.getSurvivalTime());
 	}
 
-	m_window.draw(m_health);
-	m_window.draw(m_scoreText);
 	m_window.display();
 	
 }
@@ -192,6 +226,8 @@ void Game::setupFontAndText()
 	{
 		std::cout << "problem loading arial black font" << std::endl;
 	}
+
+	// player health
 	m_health.setFont(m_ArialBlackfont);
 	m_health.setString("Health: " + std::to_string(m_player.getHealth()));
 	m_health.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
@@ -200,6 +236,7 @@ void Game::setupFontAndText()
 	m_health.setFillColor(sf::Color::Black);
 	m_health.setOutlineColor(sf::Color::White);
 
+	// score
 	m_scoreText.setFont(m_ArialBlackfont);
 	m_scoreText.setString("Score: ");
 	m_scoreText.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
@@ -218,6 +255,7 @@ void Game::setupSprite()
 	{
 		std::cout << "problem loading background texture" << std::endl;
 	}
+
 	m_backgroundSprite.setTexture(m_backgroundTexture);
 	m_backgroundSprite.setScale(3.0f, 3.0f);
 	m_backgroundSprite.setPosition(0.0f, 0.0f);
@@ -229,6 +267,7 @@ void Game::setupSprite()
 /// </summary>
 void Game::setupObjects()
 {
+	m_player.setPosition(m_player.PLAYER_SPAWN);
 	SpawnNewWave();
 }
 
@@ -360,6 +399,11 @@ void Game::updatePlayer()
 
 	m_health.setString("Health: " + std::to_string(m_player.getHealth()));
 	m_scoreText.setString("Score: " + std::to_string(m_score));
+
+	if (m_player.getHealth() <= 0)
+	{
+		endGame();
+	}
 }
 
 /// <summary>
@@ -695,6 +739,51 @@ void Game::adjustHitbox(sf::FloatRect &t_hitbox, float t_width, float t_height)
 }
 
 /// <summary>
+/// ends game and switches to end of game screen
+/// </summary>
+void Game::endGame()
+{
+	m_mode = GameState::endScreen;
+}
+
+/// <summary>
+/// resets game after playing a round
+/// </summary>
+void Game::resetGame()
+{
+	m_score = 0;
+	m_killedStabbers = 0;
+	m_killedThrowers = 0;
+	m_animationCounter = 0;
+	m_player.setHealth(100);
+	m_waveCounter = 0;
+	m_timeCounter = 1;
+	m_mode = GameState::gameScreen;
+	m_numberStabbers = 8;
+	m_numberThrowers = 5;
+
+	for (int index = 0; index < MAX_STABBERS; index++)
+	{
+		m_stabberKobold[index].setStatus(Status::dead);
+
+		if (index >= MAX_THROWERS - 1)
+		{
+			continue;
+		}
+		else
+		{
+			m_throwerKobold[index].setStatus(Status::dead);
+			m_javelins[index].setTraveling(false);
+		}
+	}
+	
+	m_player.setPosition(m_player.PLAYER_SPAWN);
+	m_arrow.setTraveling(false);
+
+	SpawnNewWave();
+}
+
+/// <summary>
 /// updates enemies and their projectiles
 /// </summary>
 void Game::updateEnemies()
@@ -939,6 +1028,7 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 				m_arrow.setTraveling(false);
 				m_stabberKobold[index].die();
 				m_score += SCORE_PER_STABBER;
+				m_killedStabbers++;
 			}
 		}
 
@@ -961,6 +1051,7 @@ bool Game::arrowHitDetection(sf::Vector2f t_position)
 					m_arrow.setTraveling(false);
 					m_throwerKobold[index].die();
 					m_score += SCORE_PER_THROWER;
+					m_killedThrowers++;
 				}
 			}
 		}
@@ -1005,7 +1096,7 @@ void Game::SpawnNewWave()
 			m_stabberKobold[index].spawnRandom();
 		}
 
-		if (index > m_numberThrowers - 1)
+		if (index > m_numberThrowers)
 		{
 			continue;
 		}
@@ -1016,13 +1107,13 @@ void Game::SpawnNewWave()
 		}
 	}
 
-	if (m_numberStabbers <= MAX_STABBERS - 2)
+	if (m_numberStabbers <= MAX_STABBERS)
 	{
-		m_numberStabbers += 2;
+		m_numberStabbers += 1;
 	}
-	if (m_numberThrowers <= MAX_THROWERS - 2)
+	if (m_numberThrowers <= MAX_THROWERS)
 	{
-		m_numberThrowers += 2;
+		m_numberThrowers += 1;
 	}
 
 	m_waveCounter++;

@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Arrow.h"
+#include "Globals.h"
 
 enum class Direction {
 	Up,
@@ -47,6 +48,7 @@ public:
 	void takeDamage(short t_damage);
 
 	const float PLAYER_SPEED = 2.5f;
+	const sf::Vector2f PLAYER_SPAWN = { WINDOW_WIDTH / 2.0f, 500.0f };
 
 	
 private:

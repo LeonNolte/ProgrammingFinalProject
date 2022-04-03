@@ -6,11 +6,18 @@
 
 #pragma once
 
+
+
 enum class Status {
 	fleeing, // default
 	dead,
 	entering,
 	following,
+};
+
+enum class GameState {
+	gameScreen,
+	endScreen
 };
 
 const unsigned int WINDOW_WIDTH = 1200; // window width

@@ -45,6 +45,9 @@
     <ClCompile Include="Javelin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EndGameScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EndGameScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
